@@ -1,3 +1,4 @@
+import 'package:expense_tracker_pro_new/data/models/category_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../categories/subcategory_provider.dart';
@@ -5,6 +6,7 @@ import 'transactions_provider.dart';
 import '../categories/categories_provider.dart';
 import '../categories/add_category_screen.dart';
 import '../../data/models/transaction.dart';
+
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
   final Txn? existingTxn;
@@ -47,6 +49,11 @@ void initState() {
   @override
   Widget build(BuildContext context) {
     final categories = ref.watch(categoriesProvider);
+    final filteredCategories = categories.where((c) {
+       return (_type == 'expense' && c.type == CategoryType.expense) ||
+         (_type == 'income' && c.type == CategoryType.income);
+        }).toList();
+        
     final subcategories = ref.watch(subcategoryProvider);
     final filteredSub = subcategories
     .where((s) => s.parentId == selectedCategoryId)
@@ -77,6 +84,7 @@ void initState() {
                 onChanged: (value) {
                   setState(() {
                     _type = value!;
+                    selectedCategoryId = null; 
                     selectedSubCategoryId = null;
                   });
                 },
@@ -108,7 +116,7 @@ void initState() {
               DropdownButtonFormField<String>(
                 value: selectedCategoryId,
                 hint: const Text('Select Category'),
-                items: categories.map((c) {
+                items: filteredCategories.map((c) {
                   return DropdownMenuItem<String>(
                     value: c.id,
                     child: Text(c.name),
@@ -159,34 +167,39 @@ void initState() {
               const SizedBox(height: 24),
 
               ElevatedButton(
-               onPressed: () async {
-  if (!_formKey.currentState!.validate()) return;
+  onPressed: () async {
+    if (!_formKey.currentState!.validate()) return;
 
-  final notifier = ref.read(transactionsProvider.notifier);
+    // ← Товчийг disable болгох
+    if (!mounted) return;
 
-  if (widget.existingTxn == null) {
-    await notifier.add(
-      type: _type,
-      amount: double.parse(_amountController.text),
-      categoryId: selectedCategoryId!,
-      date: DateTime.now(),
-    );
-  } else {
-    await notifier.update(
-      id: widget.existingTxn!.id,
-      type: _type,
-      amount: double.parse(_amountController.text),
-      categoryId: selectedCategoryId!,
-      date: widget.existingTxn!.date,
-    );
-  }
+    final notifier = ref.read(transactionsProvider.notifier);
 
-  if (context.mounted) {
-    Navigator.pop(context);
-  }
-},
-                child: const Text('Save'),
-              ),
+    if (widget.existingTxn == null) {
+      await notifier.add(
+        type: _type,
+        amount: double.parse(_amountController.text),
+        categoryId: selectedCategoryId!,
+        subCategoryId: selectedSubCategoryId,
+        date: DateTime.now(),
+      );
+    } else {
+      await notifier.update(
+        id: widget.existingTxn!.id,
+        type: _type,
+        amount: double.parse(_amountController.text),
+        categoryId: selectedCategoryId!,
+        subCategoryId: selectedSubCategoryId,
+        date: widget.existingTxn!.date,
+      );
+    }
+
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
+  },
+  child: const Text('Save'),
+),
             ],
           ),
         ),

@@ -22,6 +22,9 @@ class Txn {
   @HiveField(5)
   final String? note;
 
+  @HiveField(6)
+  final String? subCategoryId; // ← нэмэх
+
   Txn({
     required this.id,
     required this.type,
@@ -29,5 +32,6 @@ class Txn {
     required this.categoryId,
     required this.date,
     this.note,
+    this.subCategoryId, // ← нэмэх
   });
 }

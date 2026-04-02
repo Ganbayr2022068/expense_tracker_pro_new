@@ -23,13 +23,14 @@ class TxnAdapter extends TypeAdapter<Txn> {
       categoryId: fields[3] as String,
       date: fields[4] as DateTime,
       note: fields[5] as String?,
+      subCategoryId: fields[6] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Txn obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class TxnAdapter extends TypeAdapter<Txn> {
       ..writeByte(4)
       ..write(obj.date)
       ..writeByte(5)
-      ..write(obj.note);
+      ..write(obj.note)
+      ..writeByte(6)
+      ..write(obj.subCategoryId);
   }
 
   @override

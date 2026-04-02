@@ -16,7 +16,6 @@ class DashboardScreen extends ConsumerWidget {
     double income = 0;
     double expense = 0;
 
-    // ✅ income / expense calculate
     for (final t in transactions) {
       if (t.type == 'income') {
         income += t.amount;
@@ -27,21 +26,16 @@ class DashboardScreen extends ConsumerWidget {
 
     final balance = income - expense;
 
-    // ✅ CATEGORY SUM
     final Map<String, double> dataMap = {};
 
     for (final t in transactions) {
       if (t.type == 'expense') {
-        dataMap[t.categoryId] =
-            (dataMap[t.categoryId] ?? 0) + t.amount;
+        dataMap[t.categoryId] = (dataMap[t.categoryId] ?? 0) + t.amount;
       }
     }
 
-    // ✅ TOTAL EXPENSE
-    final totalExpense =
-        dataMap.values.fold(0.0, (a, b) => a + b);
+    final totalExpense = dataMap.values.fold(0.0, (a, b) => a + b);
 
-    // ✅ COLORS
     final colors = [
       Colors.blue,
       Colors.orange,
@@ -50,22 +44,6 @@ class DashboardScreen extends ConsumerWidget {
       Colors.red,
       Colors.teal,
     ];
-
-    // ✅ EMOJI FUNCTION
-    String getEmoji(String name) {
-      switch (name.toLowerCase()) {
-        case 'food':
-          return '🍔';
-        case 'transport':
-          return '🚗';
-        case 'shopping':
-          return '🛍';
-        case 'salary':
-          return '💰';
-        default:
-          return '📦';
-      }
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -81,27 +59,22 @@ class DashboardScreen extends ConsumerWidget {
               _card('Income', income, Colors.green),
               const SizedBox(height: 12),
               _card('Expense', expense, Colors.red),
-
               const SizedBox(height: 20),
 
               const Text(
                 'Expenses by Category',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-
               const SizedBox(height: 12),
 
-              // 🔥 PIE CHART UPGRADED
+              // 🔥 PIE CHART
               SizedBox(
                 height: 250,
                 child: dataMap.isEmpty
                     ? const Center(child: Text('No expense data'))
                     : PieChart(
                         PieChartData(
-                          centerSpaceRadius: 40, // donut 🔥
+                          centerSpaceRadius: 40,
                           sections: dataMap.entries
                               .toList()
                               .asMap()
@@ -116,15 +89,13 @@ class DashboardScreen extends ConsumerWidget {
                             );
 
                             final percent = totalExpense == 0
-                                ? 0
+                                ? 0.0
                                 : (e.value / totalExpense * 100);
 
                             return PieChartSectionData(
                               value: e.value,
-                              color:
-                                  colors[index % colors.length],
-                              title:
-                                  '${getEmoji(category.name)}\n${percent.toStringAsFixed(0)}%',
+                              color: colors[index % colors.length],
+                              title: '${category.emoji}\n${percent.toStringAsFixed(0)}%', // ✅ ЗАСАВ
                               radius: 70,
                               titleStyle: const TextStyle(
                                 fontSize: 12,
@@ -155,31 +126,26 @@ class DashboardScreen extends ConsumerWidget {
                   );
 
                   final percent = totalExpense == 0
-                      ? 0
+                      ? 0.0
                       : (e.value / totalExpense * 100);
 
                   return Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 4),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
                     child: Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Row(
                           children: [
                             Container(
                               width: 12,
                               height: 12,
-                              color: colors[
-                                  index % colors.length],
+                              color: colors[index % colors.length],
                             ),
                             const SizedBox(width: 8),
-                            Text(
-                                '${getEmoji(category.name)} ${category.name}'),
+                            Text('${category.emoji} ${category.name}'), // ✅ ЗАСАВ
                           ],
                         ),
-                        Text(
-                            '${percent.toStringAsFixed(0)}%'),
+                        Text('${percent.toStringAsFixed(0)}%'),
                       ],
                     ),
                   );
@@ -192,7 +158,6 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  // ✅ reusable card
   Widget _card(String title, double amount, Color color) {
     return Card(
       child: ListTile(

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:expense_tracker_pro_new/data/models/category_type.dart';
 import '../models/category.dart';
 import 'package:hive/hive.dart';
 
@@ -12,24 +12,27 @@ Future<void> seedCategories() async {
     Category(
       id: '1',
       name: 'Food',
-      iconCodePoint: Icons.fastfood.codePoint,
+      emoji: '🍔',
+      type: CategoryType.expense,
     ),
     Category(
       id: '2',
       name: 'Transport',
-      iconCodePoint: Icons.directions_car.codePoint,
+      emoji: '🚌 ',
+      type: CategoryType.expense,
     ),
     Category(
       id: '3',
       name: 'Shopping',
-      iconCodePoint: Icons.shopping_bag.codePoint,
+      emoji: '🛍️ ',
+      type: CategoryType.expense,
     ),
     Category(
       id: '4',
       name: 'Salary',
-      iconCodePoint: Icons.attach_money.codePoint,
+      emoji: '💸',
+      type: CategoryType.income,
     ),
-    Category(id: '5', name: 'KFC', iconCodePoint: Icons.attach_money.codePoint,)
   ];
 
   for (final c in defaults) {

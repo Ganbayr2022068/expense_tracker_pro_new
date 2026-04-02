@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 part 'subcategory.g.dart'; // 🔥 заавал
 
-@HiveType(typeId: 2)
+@HiveType(typeId: 3)
 class SubCategory {
   @HiveField(0)
   final String id;

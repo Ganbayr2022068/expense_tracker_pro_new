@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'category_type.dart';
 
 part 'category.g.dart';
 
@@ -11,11 +12,15 @@ class Category {
   final String name;
 
   @HiveField(2)
-  final int iconCodePoint;
+  final String emoji; // 🔥 NEW
+
+  @HiveField(3)
+  final CategoryType type; // 🔥 NEW
 
   Category({
     required this.id,
     required this.name,
-    required this.iconCodePoint,
+    required this.emoji,
+    required this.type,
   });
 }

@@ -25,25 +25,27 @@ class TransactionsNotifier extends StateNotifier<List<Txn>> {
   }
 
   // ✅ ADD
-  Future<void> add({
-    required String type,
-    required double amount,
-    required String categoryId,
-    required DateTime date,
-    String? note,
-  }) async {
-    final txn = Txn(
-      id: _uuid.v4(),
-      type: type,
-      amount: amount,
-      categoryId: categoryId,
-      date: date,
-      note: note,
-    );
+ Future<void> add({
+  required String type,
+  required double amount,
+  required String categoryId,
+  required DateTime date,
+  String? note,
+  String? subCategoryId,
+}) async {
+  final txn = Txn(
+    id: _uuid.v4(),
+    type: type,
+    amount: amount,
+    categoryId: categoryId,
+    date: date,
+    note: note,
+    subCategoryId: subCategoryId,
+  );
 
-    await _box.put(txn.id, txn);
-    _load();
-  }
+  await _box.put(txn.id, txn);
+  _load(); // ← зөвхөн нэг удаа дуудагдах ёстой
+}
 
   // ✅ DELETE
   Future<void> delete(String id) async {
@@ -59,6 +61,7 @@ class TransactionsNotifier extends StateNotifier<List<Txn>> {
     required String categoryId,
     required DateTime date,
     String? note,
+    String? subCategoryId, // ← нэмэх
   }) async {
     final updated = Txn(
       id: id,
@@ -67,6 +70,7 @@ class TransactionsNotifier extends StateNotifier<List<Txn>> {
       categoryId: categoryId,
       date: date,
       note: note,
+      subCategoryId: subCategoryId, // ← нэмэх
     );
 
     await _box.put(id, updated);
