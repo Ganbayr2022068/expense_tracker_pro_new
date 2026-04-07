@@ -18,7 +18,7 @@ class TransactionsScreen extends ConsumerStatefulWidget {
 class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
   final _searchController = TextEditingController();
   String _searchQuery = '';
-  String _filterType = 'all'; // all, income, expense
+  String _filterType = 'all';
 
   Category getCategory(List<Category> categories, String id) {
     return categories.firstWhere(
@@ -46,15 +46,15 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
     final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
     final currency = ref.watch(currencyProvider); 
 
-    // 🔍 Filter хийх
+
     final filtered = transactions.where((t) {
       final category = getCategory(categories, t.categoryId);
 
-      // Type filter
+
       if (_filterType == 'income' && t.type != 'income') return false;
       if (_filterType == 'expense' && t.type != 'expense') return false;
 
-      // Search filter
+
       if (_searchQuery.isNotEmpty) {
         final query = _searchQuery.toLowerCase();
         final categoryMatch = category.name.toLowerCase().contains(query);
@@ -66,7 +66,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
       return true;
     }).toList();
 
-    // 📊 Summary
+
     double totalIncome = 0;
     double totalExpense = 0;
     for (final t in filtered) {
@@ -100,7 +100,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
             child: Column(
               children: [
 
-                // 🔍 Search bar
+
                 Container(
                   decoration: BoxDecoration(
                     color: cardColor,
@@ -134,7 +134,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
 
                 const SizedBox(height: 10),
 
-                // 🔘 Filter chips
+
                 Row(
                   children: [
                     _filterChip('All', 'all', Colors.purple),
@@ -155,7 +155,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
 
                 const SizedBox(height: 10),
 
-                // 📊 Summary row
+
                 if (filtered.isNotEmpty)
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -193,7 +193,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
             ),
           ),
 
-          // 📋 Transaction list
+
           Expanded(
             child: filtered.isEmpty
                 ? Center(
@@ -322,7 +322,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
     );
   }
 
-  // 🔘 Filter chip
+
   Widget _filterChip(String label, String value, Color color) {
     final isSelected = _filterType == value;
     return GestureDetector(
@@ -348,7 +348,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
     );
   }
 
-  // 📊 Summary item
+ 
   Widget _summaryItem(String label, String value, Color color) {
     return Column(
       children: [
@@ -362,7 +362,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
     );
   }
 
-  // 🔢 Format
+
   String _fmt(double amount) {
     if (amount >= 1000000) return '${(amount / 1000000).toStringAsFixed(1)}M';
     if (amount >= 1000) return '${(amount / 1000).toStringAsFixed(1)}K';

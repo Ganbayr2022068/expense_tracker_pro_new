@@ -31,7 +31,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     super.initState();
     if (widget.existingTxn != null) {
       final t = widget.existingTxn!;
-      _amountController.text = _formatter.format(t.amount.toInt()); // ← форматтай
+      _amountController.text = _formatter.format(t.amount.toInt());
       _type = t.type;
       selectedCategoryId = t.categoryId;
       selectedSubCategoryId = t.subCategoryId;

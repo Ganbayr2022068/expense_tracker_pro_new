@@ -5,7 +5,6 @@ import 'package:hive/hive.dart';
 Future<void> seedCategories() async {
   final box = Hive.box<Category>(HiveBoxes.categories);
 
-  // Хэрвээ аль хэдийн category байгаа бол дахиж үүсгэхгүй
   if (box.isNotEmpty) return;
 
   final defaults = [

@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/category.dart';
 
 class AddCategoryScreen extends ConsumerStatefulWidget {
-  final Category? existingCategory; // ← edit/delete-д ашиглана
+  final Category? existingCategory;
   const AddCategoryScreen({super.key, this.existingCategory});
 
   @override
@@ -17,7 +17,7 @@ class _AddCategoryScreenState extends ConsumerState<AddCategoryScreen> {
   CategoryType _selectedType = CategoryType.expense;
   String _selectedEmoji = '📦';
 
-  // 🎨 Emoji жагсаалт
+
   final List<String> _emojis = [
     '🍔','🚗','🛍️','🏠','💊','🎮','👗','📚','💅','🐾',
     '💰','📈','🎁','💻','🍕','✈️','🎵','🏋️','🎓','🛒',
@@ -27,7 +27,7 @@ class _AddCategoryScreenState extends ConsumerState<AddCategoryScreen> {
   @override
   void initState() {
     super.initState();
-    // Edit mode — хуучин утгуудыг ачаална
+
     if (widget.existingCategory != null) {
       _controller.text = widget.existingCategory!.name;
       _selectedType = widget.existingCategory!.type;
@@ -43,7 +43,7 @@ class _AddCategoryScreenState extends ConsumerState<AddCategoryScreen> {
       appBar: AppBar(
         title: Text(isEditing ? 'Edit Category' : 'Add Category'),
         actions: [
-          // 🗑️ Устгах товч (edit mode-д л харагдана)
+
           if (isEditing)
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
@@ -81,14 +81,14 @@ class _AddCategoryScreenState extends ConsumerState<AddCategoryScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // 📝 Нэр
+
             TextField(
               controller: _controller,
               decoration: const InputDecoration(labelText: 'Category name'),
             ),
             const SizedBox(height: 20),
 
-            // 🔄 Type сонгогч
+
             Row(
               children: [
                 const Text('Type:', style: TextStyle(fontSize: 16)),
@@ -110,7 +110,7 @@ class _AddCategoryScreenState extends ConsumerState<AddCategoryScreen> {
             ),
             const SizedBox(height: 20),
 
-            // 🎨 Emoji сонгогч
+
             Text(
               'Select Emoji:  $_selectedEmoji',
               style: const TextStyle(fontSize: 16),
@@ -142,7 +142,7 @@ class _AddCategoryScreenState extends ConsumerState<AddCategoryScreen> {
             ),
             const SizedBox(height: 24),
 
-            // 💾 Save товч
+
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

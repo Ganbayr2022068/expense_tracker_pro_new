@@ -103,9 +103,7 @@ class DashboardScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // ═══════════════════════════
-            // 💰 BALANCE CARD
-            // ═══════════════════════════
+
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(24),
@@ -155,9 +153,7 @@ class DashboardScreen extends ConsumerWidget {
 
             const SizedBox(height: 28),
 
-            // ═══════════════════════════
-            // 📊 CHARTS — SWIPE
-            // ═══════════════════════════
+
             Text(
               'Analytics',
               style: TextStyle(
@@ -219,9 +215,7 @@ class DashboardScreen extends ConsumerWidget {
 
             const SizedBox(height: 28),
 
-            // ═══════════════════════════
-            // 📋 BREAKDOWN
-            // ═══════════════════════════
+
             if (expenseMap.isNotEmpty) ...[
               Text(
                 'Expense Breakdown',
@@ -276,7 +270,7 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  // 💫 Mini stat
+
   Widget _miniStat(String label, double amount, Color color, String currency) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,7 +290,7 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  // 🎴 Chart card
+
   Widget _chartCard({
     required String title,
     required String emoji,
@@ -344,7 +338,7 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  // 🥧 Pie chart
+
   Widget _buildPieChart({
   required Map<String, double> dataMap,
   required double total,
@@ -357,7 +351,7 @@ class DashboardScreen extends ConsumerWidget {
     children: [
       PieChart(
         PieChartData(
-          centerSpaceRadius: 55, // ← томруулах
+          centerSpaceRadius: 55,
           sectionsSpace: 2,
           sections: dataMap.entries.toList().asMap().entries.map((entry) {
             final index = entry.key;
@@ -386,7 +380,7 @@ class DashboardScreen extends ConsumerWidget {
         ),
       ),
 
-      // 🔢 CENTER TEXT — нийт дүн
+
       Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -412,7 +406,7 @@ class DashboardScreen extends ConsumerWidget {
     ],
   );
 }
-  // 📋 Legend
+
   Widget _buildLegend(
     Map<String, double> dataMap,
     double total,

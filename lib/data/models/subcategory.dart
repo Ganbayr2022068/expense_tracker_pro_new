@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
 
-part 'subcategory.g.dart'; // 🔥 заавал
+part 'subcategory.g.dart';
 
 @HiveType(typeId: 3)
 class SubCategory {

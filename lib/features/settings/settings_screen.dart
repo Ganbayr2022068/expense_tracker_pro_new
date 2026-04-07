@@ -57,7 +57,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     ref.read(currencyProvider.notifier).setCurrency(currency);
   }
 
-  // 🗑️ Бүх өгөгдөл цэвэрлэх
+
   Future<void> _clearAllData() async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -93,7 +93,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
-  // 🔒 Нууц үг солих
+
   Future<void> _changePassword() async {
     final currentCtrl = TextEditingController();
     final newCtrl = TextEditingController();
@@ -212,9 +212,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // ═══════════════════════════
-            // 🎨 APPEARANCE
-            // ═══════════════════════════
+
             _sectionTitle('Appearance', textColor),
             const SizedBox(height: 8),
             Container(
@@ -251,9 +249,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             const SizedBox(height: 20),
 
-            // ═══════════════════════════
-            // 💱 CURRENCY
-            // ═══════════════════════════
+
             _sectionTitle('Currency', textColor),
             const SizedBox(height: 8),
             Container(
@@ -299,9 +295,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             const SizedBox(height: 20),
 
-            // ═══════════════════════════
-            // 🔒 SECURITY
-            // ═══════════════════════════
+
             _sectionTitle('Security', textColor),
             const SizedBox(height: 8),
             Container(
@@ -331,9 +325,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             const SizedBox(height: 20),
 
-            // ═══════════════════════════
-            // 🗑️ DATA
-            // ═══════════════════════════
+
             _sectionTitle('Data', textColor),
             const SizedBox(height: 8),
             Container(
@@ -363,9 +355,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             const SizedBox(height: 20),
 
-            // ═══════════════════════════
-            // ℹ️ ABOUT
-            // ═══════════════════════════
+
             _sectionTitle('About', textColor),
             const SizedBox(height: 8),
             Container(
@@ -419,7 +409,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  // 💱 Currency picker
+
   void _showCurrencyPicker(
       Color cardColor, Color textColor, Color subColor) {
     showModalBottomSheet(

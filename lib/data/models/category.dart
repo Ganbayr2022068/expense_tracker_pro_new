@@ -12,10 +12,10 @@ class Category {
   final String name;
 
   @HiveField(2)
-  final String emoji; // 🔥 NEW
+  final String emoji;
 
   @HiveField(3)
-  final CategoryType type; // 🔥 NEW
+  final CategoryType type;
 
   Category({
     required this.id,

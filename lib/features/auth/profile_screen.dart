@@ -31,7 +31,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     _emailController.text = user?.email ?? '';
   }
 
-  // 📷 Зураг сонгох
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(
@@ -43,7 +42,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
-  // 💾 Profile хадгалах
   Future<void> _saveProfile() async {
     if (_nameController.text.isEmpty) return;
     setState(() => _isLoading = true);
@@ -69,7 +67,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
-  // 🔑 Нууц үг солих
+
   Future<void> _changePassword() async {
     if (_newPasswordController.text.isEmpty ||
         _currentPasswordController.text.isEmpty) return;
@@ -104,7 +102,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
-  // 🗑️ Акаунт устгах
+
   Future<void> _deleteAccount() async {
     final confirm = await showDialog<bool>(
       context: context,
@@ -150,9 +148,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         child: Column(
           children: [
 
-            // ═══════════════════════════
-            // 👤 PROFILE ЗУРАГ
-            // ═══════════════════════════
+
             GestureDetector(
               onTap: _pickImage,
               child: Stack(
@@ -184,13 +180,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(height: 8),
 
-            // Email
+
             Text(
               user?.email ?? '',
               style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
 
-            // Email verified badge
+
             if (user?.emailVerified == true)
               const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -221,9 +217,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
             const SizedBox(height: 24),
 
-            // ═══════════════════════════
-            // 📝 НЭРИЙН МЭДЭЭЛЭЛ
-            // ═══════════════════════════
+
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -275,9 +269,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
             const SizedBox(height: 16),
 
-            // ═══════════════════════════
-            // 🔑 НУУЦ ҮГ СОЛИХ
-            // ═══════════════════════════
+
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -334,10 +326,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
             const SizedBox(height: 16),
 
-            // ═══════════════════════════
-            // ⚙️ SETTINGS
-            // ═══════════════════════════
-// ⚙️ SETTINGS card
+
 Card(
   child: ListTile(
     leading: const Icon(Icons.settings, color: Colors.purple),
@@ -353,9 +342,7 @@ Card(
 
 const SizedBox(height: 16),
 
-            // ═══════════════════════════
-            // 🚪 LOGOUT & DELETE
-            // ═══════════════════════════
+
             Card(
               child: Column(
                 children: [

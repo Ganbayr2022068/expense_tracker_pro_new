@@ -1,5 +1,3 @@
-// lib/utils/emoji_helper.dart
-
 String getEmoji(String name) {
   final n = name.toLowerCase().trim();
 

@@ -59,7 +59,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final subColor = isDark ? Colors.white38 : Colors.grey;
 
-    // 📅 Сарын transactions шүүх
+
     final monthTxns = transactions.where((t) =>
         t.date.year == _selectedMonth.year &&
         t.date.month == _selectedMonth.month).toList();
@@ -72,7 +72,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
     }
     final balance = income - expense;
 
-    // 📊 Expense by category
+
     final Map<String, double> expenseMap = {};
     for (final t in monthTxns) {
       if (t.type == 'expense') {
@@ -80,7 +80,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
       }
     }
 
-    // 📊 Өдрөөр бүлэглэх (Bar chart)
+
     final Map<int, double> dailyExpense = {};
     final Map<int, double> dailyIncome = {};
     for (final t in monthTxns) {
@@ -120,9 +120,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
-            // ═══════════════════════════
-            // 📅 MONTH SELECTOR
-            // ═══════════════════════════
+
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
@@ -155,9 +153,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
 
             const SizedBox(height: 16),
 
-            // ═══════════════════════════
-            // 💰 SUMMARY
-            // ═══════════════════════════
+
             Row(
               children: [
                 Expanded(child: _statCard('Income', income, Colors.green,
@@ -196,9 +192,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
 
             const SizedBox(height: 24),
 
-            // ═══════════════════════════
-            // 📊 DAILY BAR CHART
-            // ═══════════════════════════
+
             Text('Daily Overview',
                 style: TextStyle(
                     color: textColor,
@@ -282,9 +276,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
 
             const SizedBox(height: 24),
 
-            // ═══════════════════════════
-            // 📋 EXPENSE BY CATEGORY
-            // ═══════════════════════════
+
             if (expenseMap.isNotEmpty) ...[
               Text('Expense by Category',
                   style: TextStyle(
@@ -337,7 +329,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
                             ],
                           ),
                           const SizedBox(height: 6),
-                          // Progress bar
+
                           ClipRRect(
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(

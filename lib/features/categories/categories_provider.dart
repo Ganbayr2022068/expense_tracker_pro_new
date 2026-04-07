@@ -17,22 +17,21 @@ class CategoriesNotifier extends StateNotifier<List<Category>> {
 
   final _box = Hive.box<Category>(HiveBoxes.categories);
 
-  // 🔥 INIT
   Future<void> _init() async {
     await _box.clear();
       await _seedDefaultCategories();
     _load();
   }
 
-  // 🔥 LOAD
+
   void _load() {
     state = _box.values.toList();
   }
 
-  // 🔥 DEFAULT CATEGORY
+
 Future<void> _seedDefaultCategories() async {
   final defaults = [
-    // 🔴 EXPENSE
+
     Category(id: '1',  name: 'Food',          type: CategoryType.expense, emoji: '🍔'),
     Category(id: '2',  name: 'Transport',      type: CategoryType.expense, emoji: '🚗'),
     Category(id: '3',  name: 'Shopping',       type: CategoryType.expense, emoji: '🛍️'),
@@ -44,7 +43,7 @@ Future<void> _seedDefaultCategories() async {
     Category(id: '9',  name: 'Beauty',         type: CategoryType.expense, emoji: '💅'),
     Category(id: '10', name: 'Pet',            type: CategoryType.expense, emoji: '🐾'),
 
-    // 🟢 INCOME
+
     Category(id: '11', name: 'Salary',         type: CategoryType.income,  emoji: '💰'),
     Category(id: '12', name: 'Investment',     type: CategoryType.income,  emoji: '📈'),
     Category(id: '13', name: 'Gift',           type: CategoryType.income,  emoji: '🎁'),
@@ -57,11 +56,11 @@ Future<void> _seedDefaultCategories() async {
   }
 }
 
-  // ➕ ADD CATEGORY
+
   Future<void> addCategory({
   required String name,
-  required CategoryType type, // 🔥 ADD
-  required String emoji,      // 🔥 ADD
+  required CategoryType type,
+  required String emoji,
 }) async {
   final id = DateTime.now().millisecondsSinceEpoch.toString();
 
@@ -75,13 +74,13 @@ Future<void> _seedDefaultCategories() async {
   await _box.put(id, newCategory);
   _load();
 }
-// 🗑️ DELETE
+
 Future<void> deleteCategory(String id) async {
   await _box.delete(id);
   _load();
 }
 
-// ✏️ UPDATE
+
 Future<void> updateCategory({
   required String id,
   required String name,

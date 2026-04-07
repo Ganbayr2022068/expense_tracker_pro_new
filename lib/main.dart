@@ -8,7 +8,7 @@ import 'data/models/category.dart';
 import 'data/local/hive_boxes.dart';
 import 'data/models/subcategory.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart'; // ← нэмэх
+import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,7 +16,7 @@ Future<void> main() async {
   await Hive.initFlutter();
 
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform, // ← нэмэх
+    options: DefaultFirebaseOptions.currentPlatform,
   );
 
   Hive.registerAdapter(TxnAdapter());

@@ -20,7 +20,7 @@ class CategoriesScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: [
 
-          // 🔴 EXPENSE
+
           const Text('🔴 Expense',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
@@ -41,7 +41,7 @@ class CategoriesScreen extends ConsumerWidget {
 
           const SizedBox(height: 20),
 
-          // 🟢 INCOME
+
           const Text('🟢 Income',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
@@ -62,7 +62,6 @@ class CategoriesScreen extends ConsumerWidget {
         ],
       ),
 
-      // ➕ Шинэ category нэмэх
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
           context,
