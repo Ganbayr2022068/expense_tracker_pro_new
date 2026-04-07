@@ -28,6 +28,7 @@ Future<void> main() async {
   await Hive.openBox<Category>(HiveBoxes.categories);
   await seedCategories();
   await Hive.openBox<SubCategory>('subcategories');
+  await Hive.openBox('settings');
 
   runApp(
     const ProviderScope(
