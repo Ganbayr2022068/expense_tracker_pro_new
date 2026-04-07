@@ -477,7 +477,7 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  // 🔢 Format amount
+
   String _formatAmount(double amount) {
     if (amount >= 1000000) {
       return '${(amount / 1000000).toStringAsFixed(1)}M';

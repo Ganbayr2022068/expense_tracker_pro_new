@@ -17,10 +17,7 @@ class ProfileScreen extends ConsumerStatefulWidget {
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _currentPasswordController = TextEditingController();
-  final _newPasswordController = TextEditingController();
   bool _isLoading = false;
-  bool _showPasswordSection = false;
   File? _imageFile;
 
   @override
@@ -29,6 +26,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final user = FirebaseAuth.instance.currentUser;
     _nameController.text = user?.displayName ?? '';
     _emailController.text = user?.email ?? '';
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    super.dispose();
   }
 
   Future<void> _pickImage() async {
@@ -67,49 +71,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
   }
 
-
-  Future<void> _changePassword() async {
-    if (_newPasswordController.text.isEmpty ||
-        _currentPasswordController.text.isEmpty) return;
-    setState(() => _isLoading = true);
-    try {
-      final user = FirebaseAuth.instance.currentUser;
-      final cred = EmailAuthProvider.credential(
-        email: user?.email ?? '',
-        password: _currentPasswordController.text,
-      );
-      await user?.reauthenticateWithCredential(cred);
-      await user?.updatePassword(_newPasswordController.text);
-      _currentPasswordController.clear();
-      _newPasswordController.clear();
-      setState(() => _showPasswordSection = false);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Password changed!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-        );
-      }
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-
   Future<void> _deleteAccount() async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text('Delete Account'),
-        content: const Text(
-            'Are you sure? This action cannot be undone.'),
+        content: const Text('Are you sure? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -117,8 +84,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete',
-                style: TextStyle(color: Colors.red)),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -148,7 +114,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         child: Column(
           children: [
 
-
+            // 📷 Профайл зураг
             GestureDetector(
               onTap: _pickImage,
               child: Stack(
@@ -180,13 +146,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ),
             const SizedBox(height: 8),
 
-
+            // Email
             Text(
               user?.email ?? '',
               style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
 
-
+            // Verified badge
             if (user?.emailVerified == true)
               const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -217,7 +183,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
             const SizedBox(height: 24),
 
-
+            // 📝 Personal Info
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -255,8 +221,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 2),
+                                child: CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Icon(Icons.save),
                         label: const Text('Save Changes'),
@@ -269,80 +234,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
             const SizedBox(height: 16),
 
-
+            // ⚙️ Settings
             Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Security',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
-                        TextButton(
-                          onPressed: () => setState(
-                              () => _showPasswordSection = !_showPasswordSection),
-                          child: Text(_showPasswordSection ? 'Cancel' : 'Change Password'),
-                        ),
-                      ],
-                    ),
-                    if (_showPasswordSection) ...[
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: _currentPasswordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Current Password',
-                          prefixIcon: Icon(Icons.lock_outline),
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        controller: _newPasswordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: 'New Password',
-                          prefixIcon: Icon(Icons.lock),
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _changePassword,
-                          child: const Text('Update Password'),
-                        ),
-                      ),
-                    ],
-                  ],
+              child: ListTile(
+                leading: const Icon(Icons.settings, color: Colors.purple),
+                title: const Text('Settings'),
+                subtitle: const Text('Currency, Dark mode, Data'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SettingsScreen()),
                 ),
               ),
             ),
 
             const SizedBox(height: 16),
 
-
-Card(
-  child: ListTile(
-    leading: const Icon(Icons.settings, color: Colors.purple),
-    title: const Text('Settings'),
-    subtitle: const Text('Currency, Dark mode, Data'),
-    trailing: const Icon(Icons.chevron_right),
-    onTap: () => Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const SettingsScreen()),
-    ),
-  ),
-),
-
-const SizedBox(height: 16),
-
-
+            // 🚪 Logout & Delete
             Card(
               child: Column(
                 children: [

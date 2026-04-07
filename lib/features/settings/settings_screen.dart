@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../core/currency_provider.dart';
 import '../../core/theme_provider.dart';
-import '../../data/local/hive_boxes.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -17,6 +17,7 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _version = '';
   String _selectedCurrency = '₮';
+  bool _isLoading = false;
 
   final List<Map<String, String>> _currencies = [
     {'symbol': '₮', 'name': 'Mongolian Tögrög (MNT)'},
@@ -46,42 +47,63 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _loadCurrency() {
-    final box = Hive.box('settings');
-    setState(() => _selectedCurrency = box.get('currency', defaultValue: '₮'));
+     final currency = ref.read(currencyProvider);
+     setState(() => _selectedCurrency = currency);
   }
 
-  Future<void> _saveCurrency(String currency) async {
-    final box = Hive.box('settings');
-    await box.put('currency', currency);
-    setState(() => _selectedCurrency = currency);
-    ref.read(currencyProvider.notifier).setCurrency(currency);
-  }
+Future<void> _saveCurrency(String currency) async {
+  await ref.read(currencyProvider.notifier).setCurrency(currency);
+  setState(() => _selectedCurrency = currency);
+}
 
 
-  Future<void> _clearAllData() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Clear All Data'),
-        content: const Text(
-            'Delete all transactions and categories?\nThis action cannot be undone!'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Clear', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
+Future<void> _clearAllData() async {
+  final confirm = await showDialog<bool>(
+    context: context,
+    builder: (_) => AlertDialog(
+      title: const Text('Clear All Data'),
+      content: const Text(
+          'Бүх transaction, category өгөгдлийг устгах уу?\nЭнэ үйлдлийг буцаах боломжгүй!'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: const Text('Clear', style: TextStyle(color: Colors.red)),
+        ),
+      ],
+    ),
+  );
 
-    if (confirm == true) {
-      await Hive.box(HiveBoxes.transactions).clear();
-      await Hive.box(HiveBoxes.categories).clear();
-      await Hive.box<dynamic>('subcategories').clear();
+  if (confirm == true) {
+    setState(() => _isLoading = true);
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) return;
+
+      final firestore = FirebaseFirestore.instance;
+      final userDoc = firestore.collection('users').doc(uid);
+
+      // 🗑️ Transactions устгах
+      final txns = await userDoc.collection('transactions').get();
+      for (final doc in txns.docs) {
+        await doc.reference.delete();
+      }
+
+      // 🗑️ Categories устгах
+      final cats = await userDoc.collection('categories').get();
+      for (final doc in cats.docs) {
+        await doc.reference.delete();
+      }
+
+      // 🗑️ Subcategories устгах
+      final subs = await userDoc.collection('subcategories').get();
+      for (final doc in subs.docs) {
+        await doc.reference.delete();
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -90,8 +112,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         );
       }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      setState(() => _isLoading = false);
     }
   }
+}
 
 
   Future<void> _changePassword() async {
@@ -410,15 +444,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
 
-  void _showCurrencyPicker(
-      Color cardColor, Color textColor, Color subColor) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: cardColor,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (_) => Padding(
+void _showCurrencyPicker(
+    Color cardColor, Color textColor, Color subColor) {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: cardColor,
+    isScrollControlled: true, // ← нэмэх
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (_) => DraggableScrollableSheet( // ← ScrollableSheet болгох
+      initialChildSize: 0.6,
+      maxChildSize: 0.9,
+      minChildSize: 0.4,
+      expand: false,
+      builder: (_, scrollController) => SingleChildScrollView(
+        controller: scrollController,
         padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -454,8 +495,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _sectionTitle(String title, Color textColor) {
     return Padding(

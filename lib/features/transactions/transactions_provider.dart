@@ -1,9 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hive/hive.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../data/models/transaction.dart';
-import '../../data/local/hive_boxes.dart';
 
 final transactionsProvider =
     StateNotifierProvider<TransactionsNotifier, List<Txn>>(
@@ -12,47 +12,64 @@ final transactionsProvider =
 
 class TransactionsNotifier extends StateNotifier<List<Txn>> {
   TransactionsNotifier() : super([]) {
-    _load();
+    _listen();
   }
 
-  Box<Txn> get _box => Hive.box<Txn>(HiveBoxes.transactions);
   final _uuid = const Uuid();
 
-  void _load() {
-    final items = _box.values.toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
-    state = items;
+  CollectionReference get _col {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('transactions');
   }
 
-
- Future<void> add({
-  required String type,
-  required double amount,
-  required String categoryId,
-  required DateTime date,
-  String? note,
-  String? subCategoryId,
-}) async {
-  final txn = Txn(
-    id: _uuid.v4(),
-    type: type,
-    amount: amount,
-    categoryId: categoryId,
-    date: date,
-    note: note,
-    subCategoryId: subCategoryId,
-  );
-
-  await _box.put(txn.id, txn);
-  _load();
-}
-
-
-  Future<void> delete(String id) async {
-    await _box.delete(id);
-    _load();
+  void _listen() {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('transactions')
+        .orderBy('date', descending: true)
+        .snapshots()
+        .listen((snapshot) {
+      state = snapshot.docs.map((doc) {
+        final data = doc.data();
+        return Txn(
+          id: data['id'],
+          type: data['type'],
+          amount: (data['amount'] as num).toDouble(),
+          categoryId: data['categoryId'],
+          date: (data['date'] as Timestamp).toDate(),
+          note: data['note'],
+          subCategoryId: data['subCategoryId'],
+        );
+      }).toList();
+    });
   }
 
+  Future<void> add({
+    required String type,
+    required double amount,
+    required String categoryId,
+    required DateTime date,
+    String? note,
+    String? subCategoryId,
+  }) async {
+    final id = _uuid.v4();
+    await _col.doc(id).set({
+      'id': id,
+      'type': type,
+      'amount': amount,
+      'categoryId': categoryId,
+      'date': Timestamp.fromDate(date),
+      'note': note,
+      'subCategoryId': subCategoryId,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
 
   Future<void> update({
     required String id,
@@ -63,17 +80,17 @@ class TransactionsNotifier extends StateNotifier<List<Txn>> {
     String? note,
     String? subCategoryId,
   }) async {
-    final updated = Txn(
-      id: id,
-      type: type,
-      amount: amount,
-      categoryId: categoryId,
-      date: date,
-      note: note,
-      subCategoryId: subCategoryId,
-    );
+    await _col.doc(id).update({
+      'type': type,
+      'amount': amount,
+      'categoryId': categoryId,
+      'date': Timestamp.fromDate(date),
+      'note': note,
+      'subCategoryId': subCategoryId,
+    });
+  }
 
-    await _box.put(id, updated);
-    _load();
+  Future<void> delete(String id) async {
+    await _col.doc(id).delete();
   }
 }
