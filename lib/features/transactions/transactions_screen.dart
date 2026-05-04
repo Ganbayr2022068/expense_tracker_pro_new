@@ -7,6 +7,8 @@ import '../categories/subcategory_provider.dart';
 import 'transactions_provider.dart';
 import 'add_transaction_screen.dart';
 import '../../data/models/category.dart';
+import '../../core/language_provider.dart';
+import '../../core/app_strings.dart';
 
 class TransactionsScreen extends ConsumerStatefulWidget {
   const TransactionsScreen({super.key});
@@ -45,6 +47,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
     final bgColor = isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF7F8FA);
     final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
     final currency = ref.watch(currencyProvider); 
+    final lang = ref.watch(languageProvider);
 
 
     final filtered = transactions.where((t) {
@@ -83,7 +86,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
         backgroundColor: bgColor,
         elevation: 0,
         title: Text(
-          'Transactions',
+          AppStrings.get('transactions', lang),
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w700,
@@ -110,7 +113,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                     controller: _searchController,
                     onChanged: (v) => setState(() => _searchQuery = v),
                     decoration: InputDecoration(
-                      hintText: 'Search transactions...',
+                      hintText: AppStrings.get('search_transactions', lang),
                       hintStyle: TextStyle(
                         color: isDark ? Colors.white38 : Colors.grey,
                         fontSize: 14,
@@ -137,11 +140,11 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
 
                 Row(
                   children: [
-                    _filterChip('All', 'all', Colors.purple),
+                    _filterChip(AppStrings.get('all', lang), 'all', Colors.purple),
                     const SizedBox(width: 8),
-                    _filterChip('Income', 'income', Colors.green),
+                    _filterChip(AppStrings.get('income', lang), 'income', Colors.green),
                     const SizedBox(width: 8),
-                    _filterChip('Expense', 'expense', Colors.red),
+                    _filterChip(AppStrings.get('expense', lang), 'expense', Colors.red),
                     const Spacer(),
                     Text(
                       '${filtered.length} items',
@@ -167,18 +170,18 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        _summaryItem('↑ Income',
+                        _summaryItem(AppStrings.get('income', lang),
                             '$currency${_fmt(totalIncome)}', Colors.green),
                         Container(
                             width: 1, height: 30,
                             color: isDark ? Colors.white12 : Colors.grey.shade200),
-                        _summaryItem('↓ Expense',
+                        _summaryItem(AppStrings.get('expense', lang),
                             '$currency${_fmt(totalExpense)}', Colors.red),
                         Container(
                             width: 1, height: 30,
                             color: isDark ? Colors.white12 : Colors.grey.shade200),
                         _summaryItem(
-                          'Balance',
+                          AppStrings.get('balance', lang),
                           '$currency${_fmt(totalIncome - totalExpense)}',
                           (totalIncome - totalExpense) >= 0
                               ? Colors.blue

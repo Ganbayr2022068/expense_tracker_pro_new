@@ -1,58 +1,31 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/category.dart';
 import '../../data/models/category_type.dart';
+import '../../data/services/firestore_service.dart';
+import '../transactions/transactions_provider.dart';
 
 final categoriesProvider =
     StateNotifierProvider<CategoriesNotifier, List<Category>>((ref) {
-  return CategoriesNotifier();
+  return CategoriesNotifier(ref.read(firestoreServiceProvider));
 });
 
 class CategoriesNotifier extends StateNotifier<List<Category>> {
-  CategoriesNotifier() : super([]) {
+  CategoriesNotifier(this._service) : super([]) {
     _listen();
   }
 
-  CollectionReference get _col {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('categories');
+  final FirestoreService _service;
+
+  void _listen() {
+    _service.categoriesStream().listen((cats) async {
+      if (cats.isEmpty) {
+        await _seedDefaultCategories();
+      } else {
+        state = cats;
+      }
+    });
   }
-
-void _listen() {
-  final uid = FirebaseAuth.instance.currentUser?.uid;
-  if (uid == null) return;
-  
-  FirebaseFirestore.instance
-      .collection('users')
-      .doc(uid)
-      .collection('categories')
-      .snapshots()
-      .listen((snapshot) async {
-
-    final validDocs = snapshot.docs.where((doc) => doc.exists).toList();
-    
-    if (validDocs.isEmpty) {
-      await _seedDefaultCategories();
-    } else {
-      state = validDocs.map((doc) {
-        final data = doc.data();
-        return Category(
-          id: data['id'],
-          name: data['name'],
-          emoji: data['emoji'],
-          type: data['type'] == 'income'
-              ? CategoryType.income
-              : CategoryType.expense,
-        );
-      }).toList();
-    }
-  });
-}
 
   Future<void> _seedDefaultCategories() async {
     final defaults = [
@@ -73,12 +46,12 @@ void _listen() {
       Category(id: '15', name: 'Rental Income',  type: CategoryType.income,  emoji: '🏠'),
     ];
     for (final c in defaults) {
-      await _col.doc(c.id).set({
-        'id': c.id,
-        'name': c.name,
-        'emoji': c.emoji,
-        'type': c.type == CategoryType.income ? 'income' : 'expense',
-      });
+      await _service.addCategory(
+        id: c.id,
+        name: c.name,
+        emoji: c.emoji,
+        type: c.type,
+      );
     }
   }
 
@@ -88,16 +61,7 @@ void _listen() {
     required String emoji,
   }) async {
     final id = DateTime.now().millisecondsSinceEpoch.toString();
-    await _col.doc(id).set({
-      'id': id,
-      'name': name,
-      'emoji': emoji,
-      'type': type == CategoryType.income ? 'income' : 'expense',
-    });
-  }
-
-  Future<void> deleteCategory(String id) async {
-    await _col.doc(id).delete();
+    await _service.addCategory(id: id, name: name, emoji: emoji, type: type);
   }
 
   Future<void> updateCategory({
@@ -106,10 +70,10 @@ void _listen() {
     required CategoryType type,
     required String emoji,
   }) async {
-    await _col.doc(id).update({
-      'name': name,
-      'emoji': emoji,
-      'type': type == CategoryType.income ? 'income' : 'expense',
-    });
+    await _service.updateCategory(id: id, name: name, emoji: emoji, type: type);
+  }
+
+  Future<void> deleteCategory(String id) async {
+    await _service.deleteCategory(id);
   }
 }

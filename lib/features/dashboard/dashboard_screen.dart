@@ -7,6 +7,8 @@ import '../transactions/transactions_provider.dart';
 import '../categories/categories_provider.dart';
 import '../../data/models/category_type.dart';
 import '../../data/models/category.dart';
+import '../../core/language_provider.dart';
+import '../../core/app_strings.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -18,6 +20,7 @@ class DashboardScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final currency = ref.watch(currencyProvider);
+    final lang = ref.watch(languageProvider);
 
     double income = 0;
     double expense = 0;
@@ -77,7 +80,7 @@ class DashboardScreen extends ConsumerWidget {
         backgroundColor: bgColor,
         elevation: 0,
         title: Text(
-          'Dashboard',
+          AppStrings.get('dashboard', lang),
           style: TextStyle(
             color: textColor,
             fontSize: 24,
@@ -121,9 +124,9 @@ class DashboardScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Total Balance',
-                    style: TextStyle(
+                  Text(
+                    AppStrings.get('total Balance', lang),
+                    style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 13,
                       letterSpacing: 0.5,
@@ -155,7 +158,7 @@ class DashboardScreen extends ConsumerWidget {
 
 
             Text(
-              'Analytics',
+              AppStrings.get('analytics', lang),
               style: TextStyle(
                 color: textColor,
                 fontSize: 18,
@@ -170,10 +173,10 @@ class DashboardScreen extends ConsumerWidget {
               child: PageView(
                 children: [
                   _chartCard(
-                    title: 'Expenses',
+                    title: AppStrings.get('expenses', lang),
                     emoji: '🔴',
                     isEmpty: expenseMap.isEmpty,
-                    emptyMsg: 'No expense data yet',
+                    emptyMsg: AppStrings.get('no_expense', lang),
                     cardColor: cardColor,
                     textColor: textColor,
                     subColor: subColor,
@@ -186,10 +189,10 @@ class DashboardScreen extends ConsumerWidget {
                     ),
                   ),
                   _chartCard(
-                    title: 'Income',
+                    title: AppStrings.get('income', lang),
                     emoji: '🟢',
                     isEmpty: incomeMap.isEmpty,
-                    emptyMsg: 'No income data yet',
+                    emptyMsg: AppStrings.get('no_income', lang),
                     cardColor: cardColor,
                     textColor: textColor,
                     subColor: subColor,
@@ -208,7 +211,7 @@ class DashboardScreen extends ConsumerWidget {
             const SizedBox(height: 6),
             Center(
               child: Text(
-                'Swipe for Income →',
+                AppStrings.get('swipe_income', lang),
                 style: TextStyle(fontSize: 11, color: subColor),
               ),
             ),
@@ -218,7 +221,7 @@ class DashboardScreen extends ConsumerWidget {
 
             if (expenseMap.isNotEmpty) ...[
               Text(
-                'Expense Breakdown',
+                AppStrings.get('expense_breakdown', lang),
                 style: TextStyle(
                   color: textColor,
                   fontSize: 18,
@@ -242,7 +245,7 @@ class DashboardScreen extends ConsumerWidget {
             if (incomeMap.isNotEmpty) ...[
               const SizedBox(height: 20),
               Text(
-                'Income Breakdown',
+                AppStrings.get('income_breakdown', lang),
                 style: TextStyle(
                   color: textColor,
                   fontSize: 18,

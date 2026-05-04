@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../features/auth/auth_provider.dart';
 import '../features/auth/login_screen.dart';
 import '../features/dashboard/dashboard_screen.dart';
 import '../features/transactions/transactions_screen.dart';
 import '../features/categories/categories_screen.dart';
 import 'theme.dart';
 import 'theme_provider.dart';
-import '../features/auth/profile_screen.dart'; 
+import '../features/auth/profile_screen.dart';
+import '../features/transactions/transactions_provider.dart';
+
 class ExpenseTrackerApp extends ConsumerWidget {
   const ExpenseTrackerApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider);
+    final authState = ref.watch(authStateProvider); // ← authStateProvider болгов
     final isDark = ref.watch(themeProvider);
 
     return MaterialApp(
@@ -54,7 +55,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: screens[_index],
       bottomNavigationBar: BottomNavigationBar(

@@ -1,54 +1,30 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/models/subcategory.dart';
+import '../../data/services/firestore_service.dart';
+import '../transactions/transactions_provider.dart';
 
 final subcategoryProvider =
     StateNotifierProvider<SubCategoryNotifier, List<SubCategory>>(
-  (ref) => SubCategoryNotifier(),
+  (ref) => SubCategoryNotifier(ref.read(firestoreServiceProvider)),
 );
 
 class SubCategoryNotifier extends StateNotifier<List<SubCategory>> {
-  SubCategoryNotifier() : super([]) {
+  SubCategoryNotifier(this._service) : super([]) {
     _listen();
   }
 
-  CollectionReference get _col {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
-    return FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('subcategories');
+  final FirestoreService _service;
+
+  void _listen() {
+    _service.subcategoriesStream().listen((subs) async {
+      if (subs.isEmpty) {
+        await _seedDefaultSubcategories();
+      } else {
+        state = subs;
+      }
+    });
   }
-
-void _listen() {
-  final uid = FirebaseAuth.instance.currentUser?.uid;
-  if (uid == null) return;
-
-  FirebaseFirestore.instance
-      .collection('users')
-      .doc(uid)
-      .collection('subcategories')
-      .snapshots()
-      .listen((snapshot) async {
-    final validDocs = snapshot.docs.where((doc) => doc.exists).toList();
-
-    if (validDocs.isEmpty) {
-      await _seedDefaultSubcategories();
-    } else {
-      state = validDocs.map((doc) {
-        final data = doc.data();
-        return SubCategory(
-          id: data['id'],
-          name: data['name'],
-          parentId: data['parentId'],
-        );
-      }).toList();
-    }
-  });
-}
-
 
   Future<void> _seedDefaultSubcategories() async {
     final defaults = [
@@ -80,11 +56,11 @@ void _listen() {
       SubCategory(id: 's26', name: 'Design',         parentId: '14'),
     ];
     for (final s in defaults) {
-      await _col.doc(s.id).set({
-        'id': s.id,
-        'name': s.name,
-        'parentId': s.parentId,
-      });
+      await _service.addSubCategory(
+        id: s.id,
+        name: s.name,
+        parentId: s.parentId,
+      );
     }
   }
 
@@ -93,10 +69,6 @@ void _listen() {
     required String parentId,
   }) async {
     final id = DateTime.now().millisecondsSinceEpoch.toString();
-    await _col.doc(id).set({
-      'id': id,
-      'name': name,
-      'parentId': parentId,
-    });
+    await _service.addSubCategory(id: id, name: name, parentId: parentId);
   }
 }

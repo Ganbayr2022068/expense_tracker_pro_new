@@ -1,9 +1,11 @@
 import 'package:expense_tracker_pro_new/features/settings/settings_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'dart:convert';
 
 import '../../core/theme_provider.dart';
 
@@ -18,14 +20,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   bool _isLoading = false;
-  File? _imageFile;
-
+  String? _base64Image;
   @override
   void initState() {
     super.initState();
     final user = FirebaseAuth.instance.currentUser;
     _nameController.text = user?.displayName ?? '';
     _emailController.text = user?.email ?? '';
+    _loadProfilePhoto();
   }
 
   @override
@@ -35,14 +37,60 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     super.dispose();
   }
 
+  Future<void> _loadProfilePhoto() async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser!.uid;
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+      if (doc.exists && doc.data()?['photoBase64'] != null) {
+        setState(() => _base64Image = doc.data()!['photoBase64']);
+      }
+    } catch (_) {}
+  }
+
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 80,
+      imageQuality: 50,
+      maxWidth: 300,
+      maxHeight: 300,
     );
     if (picked != null) {
-      setState(() => _imageFile = File(picked.path));
+      setState(() => _isLoading = true);
+      try {
+        final bytes = await File(picked.path).readAsBytes();
+        final base64Str = base64Encode(bytes);
+        final uid = FirebaseAuth.instance.currentUser!.uid;
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .set({'photoBase64': base64Str}, SetOptions(merge: true));
+
+        setState(() {
+          _base64Image = base64Str;
+          _isLoading = false;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('✅ Photo updated!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        setState(() => _isLoading = false);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          );
+        }
+      }
     }
   }
 
@@ -52,6 +100,13 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       await user?.updateDisplayName(_nameController.text.trim());
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .set({'displayName': _nameController.text.trim()},
+              SetOptions(merge: true));
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -90,8 +145,29 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ),
     );
     if (confirm == true) {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid != null) {
+        await FirebaseFirestore.instance.collection('users').doc(uid).delete();
+      }
       await FirebaseAuth.instance.currentUser?.delete();
     }
+  }
+
+  Widget _buildAvatar() {
+    ImageProvider? imageProvider;
+    if (_base64Image != null) {
+      imageProvider = MemoryImage(base64Decode(_base64Image!));
+    }
+    return CircleAvatar(
+      radius: 60,
+      backgroundColor: Colors.purple.withOpacity(0.2),
+      backgroundImage: imageProvider,
+      child: _isLoading
+          ? const CircularProgressIndicator()
+          : imageProvider == null
+              ? const Icon(Icons.person, size: 60)
+              : null,
+    );
   }
 
   @override
@@ -113,21 +189,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-
-            // 📷 Профайл зураг
             GestureDetector(
-              onTap: _pickImage,
+              onTap: _isLoading ? null : _pickImage,
               child: Stack(
                 children: [
-                  CircleAvatar(
-                    radius: 60,
-                    backgroundColor: Colors.purple.withOpacity(0.2),
-                    backgroundImage:
-                        _imageFile != null ? FileImage(_imageFile!) : null,
-                    child: _imageFile == null
-                        ? const Icon(Icons.person, size: 60)
-                        : null,
-                  ),
+                  _buildAvatar(),
                   Positioned(
                     bottom: 0,
                     right: 0,
@@ -145,14 +211,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 8),
-
-            // Email
             Text(
               user?.email ?? '',
               style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
-
-            // Verified badge
             if (user?.emailVerified == true)
               const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -180,10 +242,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 label: const Text('Verify email',
                     style: TextStyle(color: Colors.orange)),
               ),
-
             const SizedBox(height: 24),
-
-            // 📝 Personal Info
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -221,7 +280,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Icon(Icons.save),
                         label: const Text('Save Changes'),
@@ -231,10 +291,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-            // ⚙️ Settings
             Card(
               child: ListTile(
                 leading: const Icon(Icons.settings, color: Colors.purple),
@@ -247,10 +304,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-            // 🚪 Logout & Delete
             Card(
               child: Column(
                 children: [
@@ -263,7 +317,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(Icons.delete_forever, color: Colors.red),
+                    leading:
+                        const Icon(Icons.delete_forever, color: Colors.red),
                     title: const Text('Delete Account',
                         style: TextStyle(color: Colors.red)),
                     onTap: _deleteAccount,
@@ -271,7 +326,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ],
               ),
             ),
-
             const SizedBox(height: 24),
           ],
         ),
