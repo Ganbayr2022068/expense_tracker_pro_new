@@ -6,8 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'dart:convert';
-
 import '../../core/theme_provider.dart';
+import '../../core/language_provider.dart';
+import '../../core/app_strings.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -77,8 +78,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('✅ Photo updated!'),
+            SnackBar(
+              content: Text(AppStrings.get('photo_updated', ref.read(languageProvider))),
               backgroundColor: Colors.green,
             ),
           );
@@ -109,8 +110,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Profile updated!'),
+          SnackBar(
+            content: Text(AppStrings.get('profile_updated', ref.read(languageProvider))),
             backgroundColor: Colors.green,
           ),
         );
@@ -130,16 +131,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: const Text('Are you sure? This action cannot be undone.'),
+        title: Text(AppStrings.get('delete_account', ref.read(languageProvider))),
+        content: Text(AppStrings.get('delete_confirm', ref.read(languageProvider))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(AppStrings.get('cancel', ref.read(languageProvider))),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text(AppStrings.get('delete', ref.read(languageProvider)), style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -174,10 +175,11 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     final isDark = ref.watch(themeProvider);
+    final lang = ref.watch(languageProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text(AppStrings.get('profile', lang)),
         actions: [
           IconButton(
             icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
@@ -216,12 +218,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
             if (user?.emailVerified == true)
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.verified, color: Colors.green, size: 16),
                   SizedBox(width: 4),
-                  Text('Verified',
+                  Text(AppStrings.get('verified', lang),
                       style: TextStyle(color: Colors.green, fontSize: 12)),
                 ],
               )
@@ -231,15 +233,15 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   await user?.sendEmailVerification();
                   if (mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Verification email sent!'),
+                      SnackBar(
+                        content: Text(AppStrings.get('verify_sent', lang)),
                         backgroundColor: Colors.orange,
                       ),
                     );
                   }
                 },
                 icon: const Icon(Icons.warning, color: Colors.orange, size: 16),
-                label: const Text('Verify email',
+                label: Text(AppStrings.get('verify_email', lang),
                     style: TextStyle(color: Colors.orange)),
               ),
             const SizedBox(height: 24),
@@ -249,14 +251,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Personal Info',
+                    Text(AppStrings.get('personal_info', lang),
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 16),
                     TextField(
                       controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Display Name',
+                      decoration: InputDecoration(
+                        labelText: AppStrings.get('display_name', lang),
                         prefixIcon: Icon(Icons.person_outline),
                         border: OutlineInputBorder(),
                       ),
@@ -265,8 +267,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     TextField(
                       controller: _emailController,
                       enabled: false,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
+                      decoration: InputDecoration(
+                        labelText: AppStrings.get('email', lang),
                         prefixIcon: Icon(Icons.email_outlined),
                         border: OutlineInputBorder(),
                       ),
@@ -284,7 +286,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Icon(Icons.save),
-                        label: const Text('Save Changes'),
+                        label: Text(AppStrings.get('save_changes', lang)),
                       ),
                     ),
                   ],
@@ -295,8 +297,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             Card(
               child: ListTile(
                 leading: const Icon(Icons.settings, color: Colors.purple),
-                title: const Text('Settings'),
-                subtitle: const Text('Currency, Dark mode, Data'),
+                title: Text(AppStrings.get('settings', lang)),
+                subtitle: Text(AppStrings.get('settings_sub', lang)),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => Navigator.push(
                   context,
@@ -310,7 +312,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 children: [
                   ListTile(
                     leading: const Icon(Icons.logout, color: Colors.orange),
-                    title: const Text('Logout'),
+                    title: Text(AppStrings.get('logout', lang)),
                     onTap: () async {
                       await FirebaseAuth.instance.signOut();
                     },
@@ -319,7 +321,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ListTile(
                     leading:
                         const Icon(Icons.delete_forever, color: Colors.red),
-                    title: const Text('Delete Account',
+                    title: Text(AppStrings.get('delete_account', lang),
                         style: TextStyle(color: Colors.red)),
                     onTap: _deleteAccount,
                   ),

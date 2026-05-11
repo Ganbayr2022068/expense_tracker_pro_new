@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
-
 import '../categories/categories_provider.dart';
 import 'transactions_provider.dart';
 import '../../data/models/category_type.dart';
 import '../../data/models/category.dart';
+import '../../core/language_provider.dart';
+import '../../core/app_strings.dart';
 
 class MonthlyReportScreen extends ConsumerStatefulWidget {
   const MonthlyReportScreen({super.key});
@@ -34,13 +35,17 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
     });
   }
 
-  String _monthName(int month) {
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    return months[month - 1];
-  }
+String _monthName(int month, String lang) {
+  const monthsEn = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  const monthsMn = [
+    '1-р сар', '2-р сар', '3-р сар', '4-р сар', '5-р сар', '6-р сар',
+    '7-р сар', '8-р сар', '9-р сар', '10-р сар', '11-р сар', '12-р сар'
+  ];
+  return lang == 'mn' ? monthsMn[month - 1] : monthsEn[month - 1];
+}
 
   String _fmt(double amount) {
     if (amount >= 1000000) return '${(amount / 1000000).toStringAsFixed(1)}M';
@@ -58,6 +63,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
     final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final subColor = isDark ? Colors.white38 : Colors.grey;
+    final lang = ref.watch(languageProvider);
 
 
     final monthTxns = transactions.where((t) =>
@@ -107,7 +113,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
       appBar: AppBar(
         backgroundColor: bgColor,
         elevation: 0,
-        title: Text('Monthly Report',
+        title: Text(AppStrings.get('monthly_report', lang),
             style: TextStyle(
               color: textColor,
               fontSize: 20,
@@ -135,7 +141,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
                     onPressed: _prevMonth,
                   ),
                   Text(
-                    '${_monthName(_selectedMonth.month)} ${_selectedMonth.year}',
+                    '${_monthName(_selectedMonth.month, lang)} ${_selectedMonth.year}',
                     style: TextStyle(
                       color: textColor,
                       fontSize: 18,
@@ -156,10 +162,10 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
 
             Row(
               children: [
-                Expanded(child: _statCard('Income', income, Colors.green,
+                Expanded(child: _statCard(AppStrings.get('income', lang), income, Colors.green,
                     Icons.arrow_upward, cardColor, textColor)),
                 const SizedBox(width: 12),
-                Expanded(child: _statCard('Expense', expense, Colors.red,
+                Expanded(child: _statCard(AppStrings.get('expense', lang), expense, Colors.red,
                     Icons.arrow_downward, cardColor, textColor)),
               ],
             ),
@@ -176,7 +182,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('Net Balance',
+                  Text(AppStrings.get('net_balance', lang), 
                       style: TextStyle(color: Colors.white70, fontSize: 14)),
                   Text(
                     '${balance >= 0 ? '+' : ''}₮${_fmt(balance)}',
@@ -193,7 +199,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
             const SizedBox(height: 24),
 
 
-            Text('Daily Overview',
+            Text(AppStrings.get('daily_overview', lang),
                 style: TextStyle(
                     color: textColor,
                     fontSize: 16,
@@ -207,7 +213,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
                 borderRadius: BorderRadius.circular(16),
               ),
               child: monthTxns.isEmpty
-                  ? Center(child: Text('No data', style: TextStyle(color: subColor)))
+                  ? Center(child: Text(AppStrings.get('no_data', lang), style: TextStyle(color: subColor)))
                   : BarChart(
                       BarChartData(
                         alignment: BarChartAlignment.spaceAround,
@@ -268,9 +274,9 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _legend('Expense', const Color(0xFFFF6584)),
+                _legend(AppStrings.get('expense', lang), const Color(0xFFFF6584)),
                 const SizedBox(width: 16),
-                _legend('Income', const Color(0xFF43E97B)),
+                _legend(AppStrings.get('income', lang), const Color(0xFF43E97B)),
               ],
             ),
 
@@ -278,7 +284,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
 
 
             if (expenseMap.isNotEmpty) ...[
-              Text('Expense by Category',
+              Text(AppStrings.get('expense_by_category', lang), 
                   style: TextStyle(
                       color: textColor,
                       fontSize: 16,

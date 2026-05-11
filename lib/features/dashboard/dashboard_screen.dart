@@ -125,8 +125,8 @@ class DashboardScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    AppStrings.get('total Balance', lang),
-                    style: const TextStyle(
+                    AppStrings.get('total_balance', lang),
+                    style: TextStyle(
                       color: Colors.white70,
                       fontSize: 13,
                       letterSpacing: 0.5,
@@ -145,9 +145,9 @@ class DashboardScreen extends ConsumerWidget {
                   const SizedBox(height: 20),
                   Row(
                     children: [
-                      _miniStat('↑ Income', income, const Color(0xFF43E97B),currency),
+                      _miniStat('↑ ${AppStrings.get('income', lang)}', income, const Color(0xFF43E97B), currency),
                       const SizedBox(width: 24),
-                      _miniStat('↓ Expense', expense, const Color(0xFFFF6584), currency),
+                      _miniStat('↓ ${AppStrings.get('expense', lang)}', expense, const Color(0xFFFF6584), currency),
                     ],
                   ),
                 ],
@@ -186,6 +186,7 @@ class DashboardScreen extends ConsumerWidget {
                       colors: expenseColors,
                       categories: categories,
                       currency: currency,
+                      lang: lang,
                     ),
                   ),
                   _chartCard(
@@ -202,6 +203,7 @@ class DashboardScreen extends ConsumerWidget {
                       colors: incomeColors,
                       categories: categories,
                       currency: currency,
+                      lang: lang,
                     ),
                   ),
                 ],
@@ -348,6 +350,7 @@ class DashboardScreen extends ConsumerWidget {
   required List<Color> colors,
   required List<Category> categories,
   required String currency,
+  required String lang,
 }) {
   return Stack(
     alignment: Alignment.center,
@@ -387,9 +390,9 @@ class DashboardScreen extends ConsumerWidget {
       Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'Total',
-            style: TextStyle(
+          Text(AppStrings.get(
+            'total', lang),
+              style: const TextStyle(
               fontSize: 11,
               color: Colors.grey,
               letterSpacing: 0.5,
