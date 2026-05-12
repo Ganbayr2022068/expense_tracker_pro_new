@@ -1,6 +1,5 @@
-# expense_tracker_pro_new
+ExpenseTracker
 
-A new Flutter project.
 
 ## Getting Started
 
