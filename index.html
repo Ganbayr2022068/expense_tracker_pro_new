@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExpenseTracker — Take Control of Your Money</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,700;12..96,800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f2eb;
+      --bg2: #edeae0;
+      --ink: #1a1a14;
+      --ink2: #4a4a3a;
+      --muted: #9a9a80;
+      --accent: #2d6a4f;
+      --accent-light: #52b788;
+      --accent-pale: #d8f3dc;
+      --warm: #e76f51;
+      --border: #d8d4c8;
+      --card: #ffffff;
+      --serif: 'Instrument Serif', serif;
+      --sans: 'Bricolage Grotesque', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--ink); overflow-x: hidden; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 2.5rem;
+      background: rgba(245,242,235,0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo { font-family: var(--serif); font-size: 1.35rem; color: var(--ink); }
+    .nav-logo span { color: var(--accent); font-style: italic; }
+    .nav-links { display: flex; align-items: center; gap: 1.8rem; }
+    .nav-links a { text-decoration: none; color: var(--ink2); font-size: 0.85rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-btn { background: var(--ink) !important; color: var(--bg) !important; padding: 0.5rem 1.2rem; border-radius: 100px; font-size: 0.82rem !important; font-weight: 600 !important; }
+    .nav-btn:hover { background: var(--accent) !important; color: white !important; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center; gap: 4rem;
+      padding: 8rem 5rem 5rem;
+      max-width: 1300px; margin: 0 auto;
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--accent-pale); color: var(--accent);
+      border: 1px solid rgba(82,183,136,0.3);
+      padding: 0.4rem 1rem; border-radius: 100px;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      margin-bottom: 2rem;
+      animation: up 0.6s ease both;
+    }
+    h1 {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 5.5vw, 5rem);
+      line-height: 1.08; letter-spacing: -0.02em; margin-bottom: 1.5rem;
+      animation: up 0.7s ease 0.1s both;
+    }
+    h1 em { font-style: italic; color: var(--accent); }
+    .hero-desc {
+      font-size: 1.05rem; line-height: 1.7; color: var(--ink2);
+      max-width: 440px; margin-bottom: 2.5rem; font-weight: 300;
+      animation: up 0.7s ease 0.2s both;
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; animation: up 0.7s ease 0.3s both; }
+    .btn-main {
+      background: var(--accent); color: white;
+      padding: 0.9rem 2rem; border-radius: 100px;
+      text-decoration: none; font-weight: 600; font-size: 0.95rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 24px rgba(45,106,79,0.3);
+    }
+    .btn-main:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(45,106,79,0.4); }
+    .btn-outline {
+      border: 1.5px solid var(--border); color: var(--ink);
+      padding: 0.9rem 2rem; border-radius: 100px;
+      text-decoration: none; font-weight: 500; font-size: 0.95rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-outline:hover { border-color: var(--ink); background: rgba(0,0,0,0.04); }
+
+    /* PHONES */
+    .hero-right {
+      display: flex; justify-content: center; align-items: center;
+      animation: up 0.9s ease 0.2s both;
+    }
+    .phones-wrap { position: relative; width: 320px; height: 520px; }
+    .phone {
+      position: absolute; width: 200px; height: 400px;
+      border-radius: 32px; background: var(--card);
+      border: 1.5px solid var(--border); overflow: hidden;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,255,255,0.8);
+    }
+    .phone-1 { top: 0; left: 0; z-index: 2; transform: rotate(-4deg); transition: transform 0.3s; }
+    .phone-1:hover { transform: rotate(-2deg) translateY(-6px); }
+    .phone-2 { top: 80px; left: 110px; z-index: 3; transform: rotate(3deg); transition: transform 0.3s; box-shadow: 0 40px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(255,255,255,0.8); }
+    .phone-2:hover { transform: rotate(1deg) translateY(-6px); }
+    .phone-bar { width: 60px; height: 4px; background: var(--border); border-radius: 2px; margin: 10px auto 8px; }
+    .s-pad { padding: 0 12px 12px; }
+    .s-lbl { font-size: 0.5rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .s-big { font-family: var(--serif); font-size: 1.5rem; color: var(--ink); line-height: 1; }
+    .s-sub { font-size: 0.5rem; color: var(--muted); margin-bottom: 10px; }
+    .s-green-card { background: var(--accent); border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; color: white; }
+    .s-gc-lbl { font-size: 0.5rem; opacity: 0.8; margin-bottom: 3px; }
+    .s-gc-val { font-family: var(--serif); font-size: 1.1rem; }
+    .s-gc-bar { height: 4px; background: rgba(255,255,255,0.25); border-radius: 2px; margin-top: 6px; }
+    .s-gc-fill { height: 100%; width: 65%; background: white; border-radius: 2px; }
+    .s-row2 { display: flex; gap: 6px; margin-bottom: 8px; }
+    .s-chip { flex: 1; background: var(--bg); border-radius: 10px; padding: 7px 8px; border: 1px solid var(--border); }
+    .s-chip-lbl { font-size: 0.45rem; color: var(--muted); }
+    .s-chip-val { font-size: 0.75rem; font-weight: 700; }
+    .green { color: var(--accent); } .red { color: var(--warm); }
+    .s-item { display: flex; align-items: center; gap: 6px; padding: 5px 0; border-bottom: 1px solid var(--border); }
+    .s-ico { width: 22px; height: 22px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; flex-shrink: 0; }
+    .s-item-info { flex: 1; }
+    .s-item-name { font-size: 0.55rem; font-weight: 500; }
+    .s-item-cat { font-size: 0.45rem; color: var(--muted); }
+    .s-item-amt { font-size: 0.58rem; font-weight: 600; }
+    .s-form-title { font-family: var(--serif); font-size: 1rem; color: var(--ink); margin: 8px 0 10px; text-align: center; }
+    .s-amount-big { text-align: center; font-family: var(--serif); font-size: 2rem; color: var(--ink); margin-bottom: 12px; }
+    .s-amount-big span { font-size: 1rem; color: var(--muted); vertical-align: top; margin-top: 4px; display: inline-block; }
+    .s-field { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 7px 10px; margin-bottom: 6px; }
+    .s-field-lbl { font-size: 0.45rem; color: var(--muted); margin-bottom: 1px; }
+    .s-field-val { font-size: 0.6rem; font-weight: 500; color: var(--ink); }
+    .s-cats { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
+    .s-cat { padding: 3px 8px; border-radius: 100px; font-size: 0.45rem; font-weight: 600; border: 1px solid var(--border); color: var(--muted); }
+    .s-cat.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .s-save { background: var(--accent); color: white; border-radius: 12px; padding: 8px; text-align: center; font-size: 0.6rem; font-weight: 700; margin-top: 4px; }
+
+    /* STATS */
+    .stats-band { background: var(--ink); padding: 3rem 2rem; display: flex; justify-content: center; gap: 5rem; flex-wrap: wrap; }
+    .stat { text-align: center; }
+    .stat-num { font-family: var(--serif); font-size: 2.5rem; color: var(--accent-light); font-style: italic; }
+    .stat-lbl { color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-top: 0.25rem; }
+
+    /* FEATURES */
+    .features { padding: 7rem 3rem; max-width: 1200px; margin: 0 auto; }
+    .eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.8rem; }
+    .sec-title { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 3.5rem; }
+    .sec-title em { font-style: italic; color: var(--accent); }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .feat-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 2rem; transition: transform 0.3s, box-shadow 0.3s; }
+    .feat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0,0,0,0.08); }
+    .feat-icon { font-size: 1.6rem; margin-bottom: 1.2rem; width: 48px; height: 48px; background: var(--accent-pale); border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+    .feat-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; }
+    .feat-desc { font-size: 0.875rem; line-height: 1.65; color: var(--ink2); font-weight: 300; }
+
+    /* ABOUT */
+    .about { background: var(--ink); padding: 7rem 3rem; display: flex; justify-content: center; }
+    .about-inner { max-width: 700px; width: 100%; display: flex; gap: 4rem; align-items: center; flex-wrap: wrap; }
+    .about-avatar {
+      width: 140px; height: 140px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif); font-style: italic; font-size: 3.5rem; color: white; flex-shrink: 0;
+      box-shadow: 0 20px 50px rgba(45,106,79,0.4);
+    }
+    .about-text { flex: 1; min-width: 220px; }
+    .about-eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 0.8rem; }
+    .about-name { font-family: var(--serif); font-size: 2rem; color: white; margin-bottom: 0.8rem; font-style: italic; }
+    .about-desc { color: rgba(255,255,255,0.55); font-size: 0.9rem; line-height: 1.7; font-weight: 300; margin-bottom: 1.5rem; }
+    .about-links { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+    .about-link { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 1.1rem; border-radius: 100px; font-size: 0.8rem; font-weight: 600; text-decoration: none; transition: transform 0.2s; }
+    .about-link:hover { transform: translateY(-2px); }
+    .link-gh { background: white; color: var(--ink); }
+    .link-em { background: var(--accent); color: white; }
+
+    /* CTA */
+    .cta { padding: 8rem 3rem; text-align: center; background: var(--bg2); border-top: 1px solid var(--border); }
+    .cta h2 { font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -0.03em; margin-bottom: 1rem; }
+    .cta h2 em { font-style: italic; color: var(--accent); }
+    .cta p { color: var(--ink2); font-size: 1.05rem; margin-bottom: 2.5rem; font-weight: 300; }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 1.8rem 3rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; color: var(--muted); font-size: 0.8rem; }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--ink); }
+
+    @keyframes up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding: 7rem 2rem 3rem; text-align: center; }
+      .hero-desc { margin: 0 auto 2rem; }
+      .hero-actions { justify-content: center; }
+      .hero-right { margin-top: 2rem; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .about-inner { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 600px) {
+      nav { padding: 1rem 1.2rem; }
+      .features-grid { grid-template-columns: 1fr; }
+      .stats-band { gap: 2.5rem; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Expense<span>Tracker</span></div>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#about">About</a>
+    <a href="https://github.com/Ganbayr2022068/expense_tracker" class="nav-btn">GitHub ↗</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-tag">📱 Flutter App</div>
+    <h1>Know where<br>your money<br><em>actually goes.</em></h1>
+    <p class="hero-desc">
+      ExpenseTracker is a simple, beautiful app that helps you log every expense, understand your spending habits, and stay within your budget — without the stress.
+    </p>
+    <div class="hero-actions">
+      <a href="https://github.com/Ganbayr2022068/expense_tracker" class="btn-main">View on GitHub →</a>
+      <a href="#features" class="btn-outline">See Features</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="phones-wrap">
+      <!-- Phone 1: Dashboard -->
+      <div class="phone phone-1">
+        <div class="phone-bar"></div>
+        <div class="s-pad">
+          <div class="s-lbl">Dashboard</div>
+          <div class="s-big">$3,240.50</div>
+          <div class="s-sub">Total balance · May 2026</div>
+          <div class="s-green-card">
+            <div class="s-gc-lbl">Monthly spending</div>
+            <div class="s-gc-val">$1,180.00</div>
+            <div class="s-gc-bar"><div class="s-gc-fill"></div></div>
+          </div>
+          <div class="s-row2">
+            <div class="s-chip"><div class="s-chip-lbl">Budget left</div><div class="s-chip-val green">$320</div></div>
+            <div class="s-chip"><div class="s-chip-lbl">Saved</div><div class="s-chip-val green">$440</div></div>
+          </div>
+          <div class="s-lbl" style="margin-bottom:4px;">Recent</div>
+          <div class="s-item">
+            <div class="s-ico" style="background:#fff3f0;">🍔</div>
+            <div class="s-item-info"><div class="s-item-name">Lunch</div><div class="s-item-cat">Food · Today</div></div>
+            <div class="s-item-amt red">-$12.50</div>
+          </div>
+          <div class="s-item">
+            <div class="s-ico" style="background:#f0f8f0;">🚌</div>
+            <div class="s-item-info"><div class="s-item-name">Bus pass</div><div class="s-item-cat">Transport · Yesterday</div></div>
+            <div class="s-item-amt red">-$2.00</div>
+          </div>
+          <div class="s-item">
+            <div class="s-ico" style="background:#f0f8f0;">💼</div>
+            <div class="s-item-info"><div class="s-item-name">Salary</div><div class="s-item-cat">Income · May 1</div></div>
+            <div class="s-item-amt green">+$2,000</div>
+          </div>
+        </div>
+      </div>
+      <!-- Phone 2: Add Expense -->
+      <div class="phone phone-2">
+        <div class="phone-bar"></div>
+        <div class="s-pad">
+          <div class="s-form-title">Add Expense</div>
+          <div class="s-amount-big"><span>$</span>24.99</div>
+          <div class="s-field"><div class="s-field-lbl">Description</div><div class="s-field-val">Grocery shopping</div></div>
+          <div class="s-field"><div class="s-field-lbl">Date</div><div class="s-field-val">May 19, 2026</div></div>
+          <div class="s-lbl" style="margin: 8px 0 5px;">Category</div>
+          <div class="s-cats">
+            <div class="s-cat">🍔 Food</div>
+            <div class="s-cat active">🛒 Shopping</div>
+            <div class="s-cat">🚌 Transport</div>
+            <div class="s-cat">🎉 Fun</div>
+            <div class="s-cat">💊 Health</div>
+          </div>
+          <div class="s-field"><div class="s-field-lbl">Note (optional)</div><div class="s-field-val" style="color:var(--muted);">Weekly groceries...</div></div>
+          <div class="s-save">Save Expense ✓</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-band">
+  <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">Free & Open Source</div></div>
+  <div class="stat"><div class="stat-num">iOS + Android</div><div class="stat-lbl">Cross-platform</div></div>
+  <div class="stat"><div class="stat-num">Real-time</div><div class="stat-lbl">Firebase Sync</div></div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="eyebrow">Features</div>
+  <h2 class="sec-title">Built for real life,<br><em>not spreadsheets.</em></h2>
+  <div class="features-grid">
+    <div class="feat-card">
+      <div class="feat-icon">💸</div>
+      <div class="feat-title">Log Expenses Instantly</div>
+      <div class="feat-desc">Add any purchase in seconds — just enter the amount, pick a category, and you're done. No complicated setup required.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📊</div>
+      <div class="feat-title">See Where Money Goes</div>
+      <div class="feat-desc">Beautiful charts show your spending by category and by month, so you always know the full picture at a glance.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🎯</div>
+      <div class="feat-title">Set Monthly Budgets</div>
+      <div class="feat-desc">Create budgets for food, transport, fun — and get notified before you overspend. Stay in control effortlessly.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">🕓</div>
+      <div class="feat-title">Full Transaction History</div>
+      <div class="feat-desc">Browse all past expenses, search by name, or filter by category and date range to find exactly what you need.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">☁️</div>
+      <div class="feat-title">Synced Across Devices</div>
+      <div class="feat-desc">Your data is securely saved to Firebase — switch phones or reinstall the app and everything is still there.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon">📱</div>
+      <div class="feat-title">Works on iOS & Android</div>
+      <div class="feat-desc">Built with Flutter for a smooth, native-feeling experience on any smartphone — iPhone or Android, no difference.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-inner">
+    <div class="about-avatar">G</div>
+    <div class="about-text">
+      <div class="about-eyebrow">About the Creator</div>
+      <div class="about-name">Ganbayr</div>
+      <p class="about-desc">A Flutter developer passionate about building clean, useful mobile apps. ExpenseTracker was created to make personal finance simple and stress-free for everyone.</p>
+      <div class="about-links">
+        <a href="https://github.com/Ganbayr2022068" class="about-link link-gh">GitHub ↗</a>
+        <a href="mailto:jadambaganbayr3@gmail.com" class="about-link link-em">Email Me</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2>Ready to <em>start tracking?</em></h2>
+  <p>Clone the project and run it on your device in minutes.</p>
+  <a href="https://github.com/Ganbayr2022068/expense_tracker" class="btn-main">View Source on GitHub →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 ExpenseTracker — Built with Flutter by Ganbayr</span>
+  <div style="display:flex;gap:1.5rem;">
+    <a href="https://github.com/Ganbayr2022068/expense_tracker">GitHub</a>
+    <a href="mailto:jadambaganbayr3@gmail.com">Contact</a>
+  </div>
+</footer>
+
+</body>
+</html>
