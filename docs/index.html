@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExpenseTracker Pro — Take Control of Your Money</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #09090f;
+      --surface: #12121c;
+      --surface2: #1a1a28;
+      --border: #2a2a40;
+      --accent: #7c5cfc;
+      --accent2: #a78bfa;
+      --green: #22c55e;
+      --red: #ef4444;
+      --text: #f0f0ff;
+      --muted: #7070a0;
+      --serif: 'Fraunces', serif;
+      --sans: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ── GRID BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(124,92,252,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,92,252,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 3rem;
+      background: rgba(9,9,15,0.85);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+    }
+    .logo {
+      font-family: var(--serif);
+      font-size: 1.3rem; font-weight: 700;
+      color: var(--text);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .logo span { color: var(--accent); font-style: italic; }
+    .nav-right { display: flex; align-items: center; gap: 2rem; }
+    .nav-right a {
+      color: var(--muted); text-decoration: none;
+      font-size: 0.85rem; font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-right a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent) !important;
+      color: white !important;
+      padding: 0.5rem 1.3rem; border-radius: 100px;
+      font-weight: 600 !important; font-size: 0.82rem !important;
+      transition: opacity 0.2s !important;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 9rem 2rem 4rem;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 800px; height: 800px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,92,252,0.12) 0%, transparent 65%);
+      top: 50%; left: 50%; transform: translate(-50%, -60%);
+      pointer-events: none;
+    }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(124,92,252,0.12);
+      border: 1px solid rgba(124,92,252,0.3);
+      color: var(--accent2);
+      padding: 0.4rem 1rem; border-radius: 100px;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; margin-bottom: 2rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: clamp(3.2rem, 7vw, 6rem);
+      font-weight: 900; line-height: 1.0;
+      letter-spacing: -0.03em; margin-bottom: 1.5rem;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+    .hero h1 em { font-style: italic; color: var(--accent2); }
+
+    .hero-sub {
+      max-width: 560px; color: var(--muted);
+      font-size: 1.1rem; line-height: 1.7; font-weight: 300;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.7s ease 0.2s both;
+    }
+
+    .hero-btns {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      margin-bottom: 5rem;
+      animation: fadeUp 0.7s ease 0.3s both;
+    }
+    .btn-primary {
+      background: var(--accent); color: white;
+      padding: 0.9rem 2.2rem; border-radius: 100px;
+      text-decoration: none; font-weight: 700; font-size: 0.95rem;
+      box-shadow: 0 8px 30px rgba(124,92,252,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(124,92,252,0.55); }
+    .btn-ghost {
+      border: 1px solid var(--border); color: var(--text);
+      padding: 0.9rem 2.2rem; border-radius: 100px;
+      text-decoration: none; font-weight: 500; font-size: 0.95rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--accent); background: rgba(124,92,252,0.06); }
+
+    /* ── PHONE SHOWCASE ── */
+    .phones-showcase {
+      display: flex; justify-content: center; align-items: flex-end;
+      gap: 1.5rem; flex-wrap: wrap;
+      animation: fadeUp 0.9s ease 0.4s both;
+    }
+
+    .phone-wrap {
+      display: flex; flex-direction: column; align-items: center; gap: 0.8rem;
+    }
+    .phone-label {
+      font-size: 0.7rem; font-weight: 600; color: var(--muted);
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+
+    .phone-frame {
+      border-radius: 36px;
+      border: 2px solid var(--border);
+      overflow: hidden;
+      box-shadow:
+        0 40px 80px rgba(0,0,0,0.6),
+        0 0 0 1px rgba(255,255,255,0.04),
+        inset 0 0 0 1px rgba(255,255,255,0.06);
+      background: #000;
+      position: relative;
+      transition: transform 0.4s;
+    }
+    .phone-frame:hover { transform: translateY(-8px); }
+
+    .phone-frame.large {
+      width: 220px; height: 460px;
+    }
+    .phone-frame.medium {
+      width: 200px; height: 420px;
+    }
+    .phone-frame.small {
+      width: 190px; height: 400px;
+    }
+
+    .phone-frame img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: top;
+      display: block;
+    }
+
+    /* center phone slightly elevated */
+    .phone-wrap.center .phone-frame {
+      box-shadow:
+        0 60px 100px rgba(124,92,252,0.3),
+        0 0 0 1px rgba(124,92,252,0.2),
+        inset 0 0 0 1px rgba(255,255,255,0.08);
+    }
+
+    /* ── STATS ── */
+    .stats {
+      position: relative; z-index: 1;
+      display: flex; justify-content: center;
+      gap: 0; flex-wrap: wrap;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .stat-item {
+      padding: 2.5rem 4rem;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-num {
+      font-family: var(--serif);
+      font-size: 2.2rem; font-weight: 900;
+      color: var(--accent2); font-style: italic;
+    }
+    .stat-lbl { color: var(--muted); font-size: 0.8rem; margin-top: 0.3rem; }
+
+    /* ── FEATURES ── */
+    .section {
+      position: relative; z-index: 1;
+      padding: 7rem 3rem;
+      max-width: 1200px; margin: 0 auto;
+    }
+    .sec-eyebrow {
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent2); margin-bottom: 0.8rem;
+    }
+    .sec-h2 {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900; line-height: 1.1;
+      letter-spacing: -0.03em; margin-bottom: 3rem;
+    }
+    .sec-h2 em { font-style: italic; color: var(--accent2); }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.2rem;
+    }
+    .feat {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px; padding: 1.8rem;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .feat:hover {
+      border-color: rgba(124,92,252,0.4);
+      transform: translateY(-4px);
+    }
+    .feat-icon {
+      width: 46px; height: 46px; border-radius: 12px;
+      background: rgba(124,92,252,0.12);
+      border: 1px solid rgba(124,92,252,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; margin-bottom: 1rem;
+    }
+    .feat-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; }
+    .feat-desc { color: var(--muted); font-size: 0.85rem; line-height: 1.65; font-weight: 300; }
+
+    /* ── ABOUT ── */
+    .about-section {
+      position: relative; z-index: 1;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 7rem 3rem;
+      display: flex; justify-content: center;
+    }
+    .about-inner {
+      max-width: 800px; width: 100%;
+      display: grid; grid-template-columns: auto 1fr;
+      gap: 4rem; align-items: center;
+    }
+    .about-avatar {
+      width: 130px; height: 130px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif); font-style: italic;
+      font-size: 3rem; font-weight: 900; color: white;
+      box-shadow: 0 20px 50px rgba(124,92,252,0.4);
+      flex-shrink: 0;
+    }
+    .about-eyebrow {
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent2); margin-bottom: 0.6rem;
+    }
+    .about-name {
+      font-family: var(--serif);
+      font-size: 2rem; font-weight: 900;
+      font-style: italic; color: var(--text);
+      margin-bottom: 0.8rem;
+    }
+    .about-bio {
+      color: var(--muted); font-size: 0.9rem;
+      line-height: 1.7; font-weight: 300; margin-bottom: 1.5rem;
+    }
+    .about-btns { display: flex; gap: 0.8rem; flex-wrap: wrap; }
+    .abt-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.55rem 1.2rem; border-radius: 100px;
+      font-size: 0.8rem; font-weight: 600;
+      text-decoration: none; transition: transform 0.2s, opacity 0.2s;
+    }
+    .abt-btn:hover { transform: translateY(-2px); opacity: 0.9; }
+    .btn-gh { background: var(--text); color: var(--bg); }
+    .btn-mail { background: var(--accent); color: white; }
+
+    /* ── CTA ── */
+    .cta-section {
+      position: relative; z-index: 1;
+      padding: 8rem 2rem; text-align: center;
+    }
+    .cta-glow {
+      position: absolute; width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,92,252,0.1) 0%, transparent 65%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .cta-section h2 {
+      font-family: var(--serif);
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      font-weight: 900; letter-spacing: -0.03em;
+      margin-bottom: 1rem; position: relative;
+    }
+    .cta-section h2 em { font-style: italic; color: var(--accent2); }
+    .cta-section p {
+      color: var(--muted); font-size: 1rem;
+      margin-bottom: 2.5rem; position: relative;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 1.8rem 3rem;
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 1rem;
+      color: var(--muted); font-size: 0.78rem;
+    }
+    footer a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    footer a:hover { color: var(--text); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .about-inner { grid-template-columns: 1fr; gap: 2rem; }
+      .stat-item { padding: 2rem 2.5rem; }
+      .phones-showcase { gap: 1rem; }
+      .phone-frame.large { width: 180px; height: 380px; }
+      .phone-frame.medium { width: 165px; height: 345px; }
+      .phone-frame.small { width: 155px; height: 325px; }
+    }
+    @media (max-width: 600px) {
+      .features-grid { grid-template-columns: 1fr; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .phones-showcase .phone-wrap:first-child,
+      .phones-showcase .phone-wrap:last-child { display: none; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">💰 Expense<span>Tracker</span></div>
+  <div class="nav-right">
+    <a href="#features">Features</a>
+    <a href="#about">About</a>
+    <a href="https://github.com/Ganbayr2022068/expense_tracker_pro_new" class="nav-cta">GitHub ↗</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="pill">📱 Built with Flutter + Firebase</div>
+  <h1>Track every dollar.<br><em>Stress less.</em></h1>
+  <p class="hero-sub">
+    ExpenseTracker is a beautiful mobile app that helps you log expenses, visualize your spending, and stay on budget — synced in real time across all your devices.
+  </p>
+  <div class="hero-btns">
+    <a href="https://github.com/Ganbayr2022068/expense_tracker_pro_new" class="btn-primary">View on GitHub →</a>
+    <a href="#features" class="btn-ghost">See Features</a>
+  </div>
+
+  <!-- REAL SCREENSHOTS IN PHONE FRAMES -->
+  <div class="phones-showcase">
+    <div class="phone-wrap">
+      <div class="phone-frame medium">
+        <img src="Screenshot_1779113028.png" alt="Profile screen"/>
+      </div>
+      <div class="phone-label">Profile</div>
+    </div>
+    <div class="phone-wrap center">
+      <div class="phone-frame large">
+        <img src="Screenshot_1779112946.png" alt="Login screen"/>
+      </div>
+      <div class="phone-label">Login</div>
+    </div>
+    <div class="phone-wrap">
+      <div class="phone-frame medium">
+        <img src="Screenshot_1779113024.png" alt="Dashboard screen"/>
+      </div>
+      <div class="phone-label">Dashboard</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat-item">
+    <div class="stat-num">100%</div>
+    <div class="stat-lbl">Free & Open Source</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">iOS + Android</div>
+    <div class="stat-lbl">Cross-platform Flutter</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num">Real-time</div>
+    <div class="stat-lbl">Firebase Sync</div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="section" id="features">
+  <div class="sec-eyebrow">Features</div>
+  <h2 class="sec-h2">Everything you need<br><em>to own your finances.</em></h2>
+  <div class="features-grid">
+    <div class="feat">
+      <div class="feat-icon">💸</div>
+      <div class="feat-title">Log Expenses Instantly</div>
+      <div class="feat-desc">Add any purchase in seconds. Just tap, enter the amount, pick a category, and you're done.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">📊</div>
+      <div class="feat-title">Visual Analytics</div>
+      <div class="feat-desc">See exactly where your money goes with beautiful charts broken down by category and month.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🎯</div>
+      <div class="feat-title">Budget Tracking</div>
+      <div class="feat-desc">Set monthly budgets per category and get alerted before you overspend.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">☁️</div>
+      <div class="feat-title">Cloud Sync via Firebase</div>
+      <div class="feat-desc">Your data is securely synced — switch phones anytime and everything is still there.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🔐</div>
+      <div class="feat-title">Secure Login</div>
+      <div class="feat-desc">Firebase Authentication keeps your account safe with email verification and password protection.</div>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">🌙</div>
+      <div class="feat-title">Dark Mode</div>
+      <div class="feat-desc">Switch between light and dark themes to match your preference, day or night.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-section" id="about">
+  <div class="about-inner">
+    <div class="about-avatar">G</div>
+    <div>
+      <div class="about-eyebrow">About the Creator</div>
+      <div class="about-name">Ganbayr</div>
+      <p class="about-bio">
+        A Flutter developer passionate about building clean, practical mobile apps. ExpenseTracker was built to make personal finance tracking simple, beautiful, and stress-free for everyone.
+      </p>
+      <div class="about-btns">
+        <a href="https://github.com/Ganbayr2022068" class="abt-btn btn-gh">GitHub ↗</a>
+        <a href="mailto:jadambaganbayr3@gmail.com" class="abt-btn btn-mail">Email Me</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-glow"></div>
+  <h2>Ready to <em>get started?</em></h2>
+  <p>Clone the repo and run it on your device in minutes.</p>
+  <a href="https://github.com/Ganbayr2022068/expense_tracker_pro_new" class="btn-primary">View Source on GitHub →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2026 ExpenseTracker — Built with Flutter by Ganbayr</span>
+  <div style="display:flex;gap:1.5rem;">
+    <a href="https://github.com/Ganbayr2022068/expense_tracker_pro_new">GitHub</a>
+    <a href="mailto:jadambaganbayr3@gmail.com">Contact</a>
+  </div>
+</footer>
+
+</body>
+</html>
