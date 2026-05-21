@@ -31,7 +31,7 @@ class CategoriesScreen extends ConsumerWidget {
                   backgroundColor: Colors.red.withOpacity(0.1),
                   child: Text(c.emoji, style: const TextStyle(fontSize: 20)),
                 ),
-                title: Text(c.name),
+                title: Text(c.localizedName(lang)),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => Navigator.push(
                   context,
@@ -51,7 +51,7 @@ class CategoriesScreen extends ConsumerWidget {
                   backgroundColor: Colors.green.withOpacity(0.1),
                   child: Text(c.emoji, style: const TextStyle(fontSize: 20)),
                 ),
-                title: Text(c.name),
+                title: Text(c.localizedName(lang)),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () => Navigator.push(
                   context,

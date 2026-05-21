@@ -6,6 +6,8 @@ import 'transactions_provider.dart';
 import '../categories/categories_provider.dart';
 import '../categories/add_category_screen.dart';
 import '../../data/models/transaction.dart';
+import '../../core/language_provider.dart';
+import '../../core/app_strings.dart';
 import 'package:intl/intl.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
@@ -27,7 +29,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
   String _type = 'expense';
   String? selectedCategoryId;
   String? selectedSubCategoryId;
-  DateTime _selectedDate = DateTime.now(); // ← огноо
+  DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
@@ -39,7 +41,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
       _type = t.type;
       selectedCategoryId = t.categoryId;
       selectedSubCategoryId = t.subCategoryId;
-      _selectedDate = t.date; // ← хуучин огноо
+      _selectedDate = t.date;
     }
   }
 
@@ -50,7 +52,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
     super.dispose();
   }
 
-  // 📅 Огноо сонгох
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -75,6 +76,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = ref.watch(languageProvider);
     final categories = ref.watch(categoriesProvider);
     final filteredCategories = categories.where((c) {
       return (_type == 'expense' && c.type == CategoryType.expense) ||
@@ -98,7 +100,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         backgroundColor: bgColor,
         elevation: 0,
         title: Text(
-          widget.existingTxn == null ? 'Add Transaction' : 'Edit Transaction',
+          widget.existingTxn == null
+              ? AppStrings.get('add_transaction', lang)
+              : AppStrings.get('edit_transaction', lang),
           style: TextStyle(
             color: textColor,
             fontSize: 20,
@@ -114,7 +118,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              // 🔄 Type selector
               Container(
                 decoration: BoxDecoration(
                   color: cardColor,
@@ -142,7 +145,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                           ),
                           child: Center(
                             child: Text(
-                              '↓ Expense',
+                              '↓ ${AppStrings.get('expense', lang)}',
                               style: TextStyle(
                                 color: _type == 'expense'
                                     ? Colors.red
@@ -169,12 +172,13 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(12),
                             border: _type == 'income'
-                                ? Border.all(color: Colors.green.withOpacity(0.5))
+                                ? Border.all(
+                                    color: Colors.green.withOpacity(0.5))
                                 : null,
                           ),
                           child: Center(
                             child: Text(
-                              '↑ Income',
+                              '↑ ${AppStrings.get('income', lang)}',
                               style: TextStyle(
                                 color: _type == 'income'
                                     ? Colors.green
@@ -192,29 +196,30 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
               const SizedBox(height: 16),
 
-              // 💰 Amount
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 decoration: BoxDecoration(
                   color: cardColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: TextFormField(
                   controller: _amountController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   style: TextStyle(
                     color: textColor,
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
                   decoration: InputDecoration(
-                    labelText: 'Amount',
+                    labelText: AppStrings.get('amount', lang),
                     labelStyle: TextStyle(color: subColor),
                     suffixText: '₮',
-                    suffixStyle: TextStyle(
+                    suffixStyle: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: const Color(0xFF6C63FF),
+                      color: Color(0xFF6C63FF),
                     ),
                     border: InputBorder.none,
                   ),
@@ -233,10 +238,14 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     }
                   },
                   validator: (value) {
-                    if (value == null || value.isEmpty) return 'Enter amount';
+                    if (value == null || value.isEmpty) {
+                      return AppStrings.get('enter_amount', lang);
+                    }
                     final clean = value.replaceAll(',', '');
                     final number = double.tryParse(clean);
-                    if (number == null || number <= 0) return 'Invalid amount';
+                    if (number == null || number <= 0) {
+                      return AppStrings.get('invalid_amount', lang);
+                    }
                     return null;
                   },
                 ),
@@ -244,7 +253,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
               const SizedBox(height: 12),
 
-              // 📅 Огноо сонгогч
               GestureDetector(
                 onTap: _pickDate,
                 child: Container(
@@ -276,9 +284,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
               const SizedBox(height: 12),
 
-              // 🏷️ Category
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 decoration: BoxDecoration(
                   color: cardColor,
                   borderRadius: BorderRadius.circular(12),
@@ -288,16 +296,16 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   dropdownColor: cardColor,
                   style: TextStyle(color: textColor),
                   decoration: InputDecoration(
-                    labelText: 'Category',
+                    labelText: AppStrings.get('category', lang),
                     labelStyle: TextStyle(color: subColor),
                     border: InputBorder.none,
                   ),
-                  hint: Text('Select Category',
+                  hint: Text(AppStrings.get('select_category', lang),
                       style: TextStyle(color: subColor)),
                   items: filteredCategories.map((c) {
                     return DropdownMenuItem<String>(
                       value: c.id,
-                      child: Text('${c.emoji} ${c.name}'),
+                      child: Text('${c.emoji} ${c.localizedName(lang)}'),
                     );
                   }).toList(),
                   onChanged: (value) {
@@ -307,7 +315,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     });
                   },
                   validator: (value) {
-                    if (value == null) return 'Select category';
+                    if (value == null) {
+                      return AppStrings.get('select_category_error', lang);
+                    }
                     return null;
                   },
                 ),
@@ -315,7 +325,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
               const SizedBox(height: 12),
 
-              // 🏷️ Subcategory
               if (filteredSub.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -329,16 +338,16 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     dropdownColor: cardColor,
                     style: TextStyle(color: textColor),
                     decoration: InputDecoration(
-                      labelText: 'Subcategory',
+                      labelText: AppStrings.get('subcategory', lang),
                       labelStyle: TextStyle(color: subColor),
                       border: InputBorder.none,
                     ),
-                    hint: Text('Select Subcategory',
+                    hint: Text(AppStrings.get('select_subcategory', lang),
                         style: TextStyle(color: subColor)),
                     items: filteredSub.map((s) {
                       return DropdownMenuItem<String>(
                         value: s.id,
-                        child: Text(s.name),
+                        child: Text(s.localizedName(lang)),
                       );
                     }).toList(),
                     onChanged: (value) {
@@ -349,7 +358,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
               const SizedBox(height: 12),
 
-              // 📝 Note
               Container(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 16, vertical: 4),
@@ -361,7 +369,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   controller: _noteController,
                   style: TextStyle(color: textColor),
                   decoration: InputDecoration(
-                    labelText: 'Note (optional)',
+                    labelText: AppStrings.get('note_optional', lang),
                     labelStyle: TextStyle(color: subColor),
                     border: InputBorder.none,
                     prefixIcon: Icon(Icons.note_outlined, color: subColor),
@@ -371,7 +379,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
 
               const SizedBox(height: 12),
 
-              // ➕ Add Category
               TextButton.icon(
                 onPressed: () async {
                   await Navigator.of(context).push(
@@ -380,12 +387,11 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                   );
                 },
                 icon: const Icon(Icons.add, size: 16),
-                label: const Text('Add Category'),
+                label: Text(AppStrings.get('add_category', lang)),
               ),
 
               const SizedBox(height: 24),
 
-              // 💾 Save
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -411,7 +417,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                         amount: amount,
                         categoryId: selectedCategoryId!,
                         subCategoryId: selectedSubCategoryId,
-                        date: _selectedDate, // ← сонгосон огноо
+                        date: _selectedDate,
                         note: _noteController.text.isEmpty
                             ? null
                             : _noteController.text,
@@ -423,7 +429,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                         amount: amount,
                         categoryId: selectedCategoryId!,
                         subCategoryId: selectedSubCategoryId,
-                        date: _selectedDate, // ← сонгосон огноо
+                        date: _selectedDate,
                         note: _noteController.text.isEmpty
                             ? null
                             : _noteController.text,
@@ -433,7 +439,9 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                     if (context.mounted) Navigator.pop(context);
                   },
                   child: Text(
-                    widget.existingTxn == null ? 'Save' : 'Update',
+                    widget.existingTxn == null
+                        ? AppStrings.get('save', lang)
+                        : AppStrings.get('update', lang),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,

@@ -22,14 +22,14 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
   String _searchQuery = '';
   String _filterType = 'all';
 
-  Category getCategory(List<Category> categories, String id) {
-    return categories.firstWhere(
-      (c) => c.id == id,
-      orElse: () => Category(
-        id: '0', name: 'Unknown', emoji: '📦', type: CategoryType.expense,
-      ),
-    );
-  }
+Category getCategory(List<Category> categories, String id) {
+  return categories.firstWhere(
+    (c) => c.id == id,
+    orElse: () => Category(
+      id: '0', name: 'Unknown', emoji: '📦', type: CategoryType.expense, nameMn: 'Тодорхойгүй',
+    ),
+  );
+}
 
   @override
   void dispose() {
@@ -209,8 +209,8 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                         const SizedBox(height: 12),
                         Text(
                           _searchQuery.isNotEmpty
-                              ? 'No results for "$_searchQuery"'
-                              : 'No transactions yet',
+                          ? 'No results for "$_searchQuery"'
+                          : AppStrings.get('no_transactions', lang),
                           style: TextStyle(
                             color: isDark ? Colors.white38 : Colors.grey,
                           ),
@@ -266,8 +266,8 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                           ),
                           title: Text(
                             sub != null
-                                ? '${category.name} › ${sub.name}'
-                                : category.name,
+                                ? '${category.localizedName(lang)} › ${sub.localizedName(lang)}'
+                                : category.localizedName(lang),
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,

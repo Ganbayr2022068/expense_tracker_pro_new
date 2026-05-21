@@ -29,26 +29,27 @@ class CategoriesNotifier extends StateNotifier<List<Category>> {
 
   Future<void> _seedDefaultCategories() async {
     final defaults = [
-      Category(id: '1',  name: 'Food',          type: CategoryType.expense, emoji: '🍔'),
-      Category(id: '2',  name: 'Transport',      type: CategoryType.expense, emoji: '🚗'),
-      Category(id: '3',  name: 'Shopping',       type: CategoryType.expense, emoji: '🛍️'),
-      Category(id: '4',  name: 'Rent',           type: CategoryType.expense, emoji: '🏠'),
-      Category(id: '5',  name: 'Health',         type: CategoryType.expense, emoji: '💊'),
-      Category(id: '6',  name: 'Entertainment',  type: CategoryType.expense, emoji: '🎮'),
-      Category(id: '7',  name: 'Clothing',       type: CategoryType.expense, emoji: '👗'),
-      Category(id: '8',  name: 'Education',      type: CategoryType.expense, emoji: '📚'),
-      Category(id: '9',  name: 'Beauty',         type: CategoryType.expense, emoji: '💅'),
-      Category(id: '10', name: 'Pet',            type: CategoryType.expense, emoji: '🐾'),
-      Category(id: '11', name: 'Salary',         type: CategoryType.income,  emoji: '💰'),
-      Category(id: '12', name: 'Investment',     type: CategoryType.income,  emoji: '📈'),
-      Category(id: '13', name: 'Gift',           type: CategoryType.income,  emoji: '🎁'),
-      Category(id: '14', name: 'Freelance',      type: CategoryType.income,  emoji: '💻'),
-      Category(id: '15', name: 'Rental Income',  type: CategoryType.income,  emoji: '🏠'),
+      Category(id: '1',  name: 'Food',          nameMn: 'Хоол',              type: CategoryType.expense, emoji: '🍔'),
+      Category(id: '2',  name: 'Transport',     nameMn: 'Тээвэр',            type: CategoryType.expense, emoji: '🚗'),
+      Category(id: '3',  name: 'Shopping',      nameMn: 'Дэлгүүр',           type: CategoryType.expense, emoji: '🛍️'),
+      Category(id: '4',  name: 'Rent',          nameMn: 'Түрээс',            type: CategoryType.expense, emoji: '🏠'),
+      Category(id: '5',  name: 'Health',        nameMn: 'Эрүүл мэнд',        type: CategoryType.expense, emoji: '💊'),
+      Category(id: '6',  name: 'Entertainment', nameMn: 'Цэнгэл',            type: CategoryType.expense, emoji: '🎮'),
+      Category(id: '7',  name: 'Clothing',      nameMn: 'Хувцас',            type: CategoryType.expense, emoji: '👗'),
+      Category(id: '8',  name: 'Education',     nameMn: 'Боловсрол',         type: CategoryType.expense, emoji: '📚'),
+      Category(id: '9',  name: 'Beauty',        nameMn: 'Гоо сайхан',        type: CategoryType.expense, emoji: '💅'),
+      Category(id: '10', name: 'Pet',           nameMn: 'Тэжээвэр амьтан',   type: CategoryType.expense, emoji: '🐾'),
+      Category(id: '11', name: 'Salary',        nameMn: 'Цалин',             type: CategoryType.income,  emoji: '💰'),
+      Category(id: '12', name: 'Investment',    nameMn: 'Хөрөнгө оруулалт',  type: CategoryType.income,  emoji: '📈'),
+      Category(id: '13', name: 'Gift',          nameMn: 'Бэлэг',             type: CategoryType.income,  emoji: '🎁'),
+      Category(id: '14', name: 'Freelance',     nameMn: 'Фриланс',           type: CategoryType.income,  emoji: '💻'),
+      Category(id: '15', name: 'Rental Income', nameMn: 'Түрээсийн орлого',  type: CategoryType.income,  emoji: '🏠'),
     ];
     for (final c in defaults) {
       await _service.addCategory(
         id: c.id,
         name: c.name,
+        nameMn: c.nameMn,
         emoji: c.emoji,
         type: c.type,
       );
@@ -57,20 +58,22 @@ class CategoriesNotifier extends StateNotifier<List<Category>> {
 
   Future<void> addCategory({
     required String name,
+    String? nameMn,
     required CategoryType type,
     required String emoji,
   }) async {
     final id = DateTime.now().millisecondsSinceEpoch.toString();
-    await _service.addCategory(id: id, name: name, emoji: emoji, type: type);
+    await _service.addCategory(id: id, name: name, nameMn: nameMn, emoji: emoji, type: type);
   }
 
   Future<void> updateCategory({
     required String id,
     required String name,
+    String? nameMn,
     required CategoryType type,
     required String emoji,
   }) async {
-    await _service.updateCategory(id: id, name: name, emoji: emoji, type: type);
+    await _service.updateCategory(id: id, name: name, nameMn: nameMn, emoji: emoji, type: type);
   }
 
   Future<void> deleteCategory(String id) async {

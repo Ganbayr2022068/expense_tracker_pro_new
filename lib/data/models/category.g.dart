@@ -21,13 +21,14 @@ class CategoryAdapter extends TypeAdapter<Category> {
       name: fields[1] as String,
       emoji: fields[2] as String,
       type: fields[3] as CategoryType,
+      nameMn: fields[4] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, Category obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -35,7 +36,9 @@ class CategoryAdapter extends TypeAdapter<Category> {
       ..writeByte(2)
       ..write(obj.emoji)
       ..writeByte(3)
-      ..write(obj.type);
+      ..write(obj.type)
+      ..writeByte(4)
+      ..write(obj.nameMn);
   }
 
   @override

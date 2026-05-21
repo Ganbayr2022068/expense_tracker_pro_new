@@ -17,10 +17,21 @@ class Category {
   @HiveField(3)
   final CategoryType type;
 
+  @HiveField(4)
+  final String? nameMn;
+
   Category({
     required this.id,
     required this.name,
     required this.emoji,
     required this.type,
+    this.nameMn,
   });
+
+    String localizedName(String lang) {
+    if (lang == 'mn' && nameMn != null && nameMn!.isNotEmpty) {
+      return nameMn!;
+    }
+    return name;
+  }
 }

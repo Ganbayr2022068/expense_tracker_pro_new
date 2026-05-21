@@ -101,6 +101,7 @@ class FirestoreService {
         return Category(
           id: data['id'],
           name: data['name'],
+          nameMn: data['nameMn'], 
           emoji: data['emoji'],
           type: data['type'] == 'income'
               ? CategoryType.income
@@ -115,10 +116,12 @@ class FirestoreService {
     required String name,
     required String emoji,
     required CategoryType type,
+    String? nameMn,
   }) async {
     await _categories.doc(id).set({
       'id': id,
       'name': name,
+      'nameMn': nameMn ?? '',
       'emoji': emoji,
       'type': type == CategoryType.income ? 'income' : 'expense',
     });
@@ -129,9 +132,11 @@ class FirestoreService {
     required String name,
     required String emoji,
     required CategoryType type,
+    String? nameMn, 
   }) async {
     await _categories.doc(id).update({
       'name': name,
+      'nameMn': nameMn ?? '',
       'emoji': emoji,
       'type': type == CategoryType.income ? 'income' : 'expense',
     });
@@ -152,6 +157,7 @@ class FirestoreService {
         return SubCategory(
           id: data['id'],
           name: data['name'],
+          nameMn: data['nameMn'],
           parentId: data['parentId'],
         );
       }).toList();
@@ -161,11 +167,13 @@ class FirestoreService {
   Future<void> addSubCategory({
     required String id,
     required String name,
+    String? nameMn,
     required String parentId,
   }) async {
     await _subcategories.doc(id).set({
       'id': id,
       'name': name,
+      'nameMn': nameMn ?? '',
       'parentId': parentId,
     });
   }
