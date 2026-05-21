@@ -24,15 +24,10 @@ class DashboardScreen extends ConsumerWidget {
 
     double income = 0;
     double expense = 0;
-
     for (final t in transactions) {
-      if (t.type == 'income') {
-        income += t.amount;
-      } else {
-        expense += t.amount;
-      }
+      if (t.type == 'income') income += t.amount;
+      else expense += t.amount;
     }
-
     final balance = income - expense;
 
     final Map<String, double> expenseMap = {};
@@ -41,7 +36,6 @@ class DashboardScreen extends ConsumerWidget {
         expenseMap[t.categoryId] = (expenseMap[t.categoryId] ?? 0) + t.amount;
       }
     }
-
     final Map<String, double> incomeMap = {};
     for (final t in transactions) {
       if (t.type == 'income') {
@@ -53,20 +47,14 @@ class DashboardScreen extends ConsumerWidget {
     final totalIncome = incomeMap.values.fold(0.0, (a, b) => a + b);
 
     final expenseColors = [
-      const Color(0xFF6C63FF),
-      const Color(0xFFFF6584),
-      const Color(0xFFFFBD59),
-      const Color(0xFF43C6AC),
-      const Color(0xFFFF6B6B),
-      const Color(0xFF4ECDC4),
+      const Color(0xFF6C63FF), const Color(0xFFFF6584),
+      const Color(0xFFFFBD59), const Color(0xFF43C6AC),
+      const Color(0xFFFF6B6B), const Color(0xFF4ECDC4),
     ];
     final incomeColors = [
-      const Color(0xFF43E97B),
-      const Color(0xFF38F9D7),
-      const Color(0xFF96FBC4),
-      const Color(0xFF43C6AC),
-      const Color(0xFF84FAB0),
-      const Color(0xFF00CDAC),
+      const Color(0xFF43E97B), const Color(0xFF38F9D7),
+      const Color(0xFF96FBC4), const Color(0xFF43C6AC),
+      const Color(0xFF84FAB0), const Color(0xFF00CDAC),
     ];
 
     final bgColor = isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF7F8FA);
@@ -82,31 +70,26 @@ class DashboardScreen extends ConsumerWidget {
         title: Text(
           AppStrings.get('dashboard', lang),
           style: TextStyle(
-            color: textColor,
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.5,
+            color: textColor, fontSize: 24,
+            fontWeight: FontWeight.w700, letterSpacing: -0.5,
           ),
         ),
-       actions: [
-    IconButton(
-      icon: const Icon(Icons.bar_chart),
-      onPressed: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const MonthlyReportScreen(),
-        ),
-      ),
-    ),
-  ],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.bar_chart),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const MonthlyReportScreen()),
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-
+            // Balance card
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(24),
@@ -116,32 +99,21 @@ class DashboardScreen extends ConsumerWidget {
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFF6C63FF).withOpacity(0.4),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
+                    blurRadius: 20, offset: const Offset(0, 8),
                   ),
                 ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    AppStrings.get('total_balance', lang),
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
+                  Text(AppStrings.get('total_balance', lang),
+                      style: const TextStyle(color: Colors.white70, fontSize: 13, letterSpacing: 0.5)),
                   const SizedBox(height: 8),
-                  Text(
-                    '$currency${_formatAmount(balance)}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 32,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -1,
-                    ),
-                  ),
+                  Text('$currency${_formatAmount(balance)}',
+                      style: const TextStyle(
+                        color: Colors.white, fontSize: 32,
+                        fontWeight: FontWeight.w800, letterSpacing: -1,
+                      )),
                   const SizedBox(height: 20),
                   Row(
                     children: [
@@ -156,20 +128,15 @@ class DashboardScreen extends ConsumerWidget {
 
             const SizedBox(height: 28),
 
-
-            Text(
-              AppStrings.get('analytics', lang),
-              style: TextStyle(
-                color: textColor,
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.3,
-              ),
-            ),
+            Text(AppStrings.get('analytics', lang),
+                style: TextStyle(
+                  color: textColor, fontSize: 18,
+                  fontWeight: FontWeight.w700, letterSpacing: -0.3,
+                )),
             const SizedBox(height: 12),
 
             SizedBox(
-              height: 320,
+              height: 420,
               child: PageView(
                 children: [
                   _chartCard(
@@ -180,13 +147,11 @@ class DashboardScreen extends ConsumerWidget {
                     cardColor: cardColor,
                     textColor: textColor,
                     subColor: subColor,
+                    isExpense: true,
                     child: _buildPieChart(
-                      dataMap: expenseMap,
-                      total: totalExpense,
-                      colors: expenseColors,
-                      categories: categories,
-                      currency: currency,
-                      lang: lang,
+                      dataMap: expenseMap, total: totalExpense,
+                      colors: expenseColors, categories: categories,
+                      currency: currency, lang: lang,
                     ),
                   ),
                   _chartCard(
@@ -197,13 +162,11 @@ class DashboardScreen extends ConsumerWidget {
                     cardColor: cardColor,
                     textColor: textColor,
                     subColor: subColor,
+                    isExpense: false,
                     child: _buildPieChart(
-                      dataMap: incomeMap,
-                      total: totalIncome,
-                      colors: incomeColors,
-                      categories: categories,
-                      currency: currency,
-                      lang: lang,
+                      dataMap: incomeMap, total: totalIncome,
+                      colors: incomeColors, categories: categories,
+                      currency: currency, lang: lang,
                     ),
                   ),
                 ],
@@ -212,61 +175,9 @@ class DashboardScreen extends ConsumerWidget {
 
             const SizedBox(height: 6),
             Center(
-              child: Text(
-                AppStrings.get('swipe_income', lang),
-                style: TextStyle(fontSize: 11, color: subColor),
-              ),
+              child: Text(AppStrings.get('swipe_income', lang),
+                  style: TextStyle(fontSize: 11, color: subColor)),
             ),
-
-            const SizedBox(height: 28),
-
-
-            if (expenseMap.isNotEmpty) ...[
-              Text(
-                AppStrings.get('expense_breakdown', lang),
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.3,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: cardColor,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: _buildLegend(
-                    expenseMap, totalExpense, expenseColors, categories,
-                    textColor: textColor, subColor: subColor, currency: currency,),
-              ),
-            ],
-
-            if (incomeMap.isNotEmpty) ...[
-              const SizedBox(height: 20),
-              Text(
-                AppStrings.get('income_breakdown', lang),
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.3,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: cardColor,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: _buildLegend(
-                    incomeMap, totalIncome, incomeColors, categories,
-                    textColor: textColor, subColor: subColor, currency: currency,),
-              ),
-            ],
 
             const SizedBox(height: 32),
           ],
@@ -275,26 +186,17 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-
   Widget _miniStat(String label, double amount, Color color, String currency) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(color: Colors.white60, fontSize: 11)),
+        Text(label, style: const TextStyle(color: Colors.white60, fontSize: 11)),
         const SizedBox(height: 2),
-        Text(
-          '$currency${_formatAmount(amount)}',
-          style: TextStyle(
-            color: color,
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+        Text('$currency${_formatAmount(amount)}',
+            style: TextStyle(color: color, fontSize: 15, fontWeight: FontWeight.w700)),
       ],
     );
   }
-
 
   Widget _chartCard({
     required String title,
@@ -305,37 +207,46 @@ class DashboardScreen extends ConsumerWidget {
     required Color textColor,
     required Color subColor,
     required Widget child,
+    required bool isExpense,
   }) {
     return Container(
       margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text(emoji, style: const TextStyle(fontSize: 16)),
-              const SizedBox(width: 6),
-              Text(
-                title,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: isExpense
+                  ? const Color(0xFF6C63FF).withOpacity(0.12)
+                  : const Color(0xFF43E97B).withOpacity(0.15),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(emoji, style: const TextStyle(fontSize: 13)),
+                const SizedBox(width: 5),
+                Text(title,
+                    style: TextStyle(
+                      color: isExpense
+                          ? const Color(0xFF6C63FF)
+                          : const Color(0xFF1D9E75),
+                      fontSize: 13, fontWeight: FontWeight.w700,
+                    )),
+              ],
+            ),
           ),
           const SizedBox(height: 12),
           Expanded(
             child: isEmpty
-                ? Center(
-                    child: Text(emptyMsg,
-                        style: TextStyle(color: subColor, fontSize: 13)))
+                ? Center(child: Text(emptyMsg,
+                    style: TextStyle(color: subColor, fontSize: 13)))
                 : child,
           ),
         ],
@@ -343,153 +254,151 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-
   Widget _buildPieChart({
-  required Map<String, double> dataMap,
-  required double total,
-  required List<Color> colors,
-  required List<Category> categories,
-  required String currency,
-  required String lang,
-}) {
-  return Stack(
-    alignment: Alignment.center,
-    children: [
-      PieChart(
-        PieChartData(
-          centerSpaceRadius: 55,
-          sectionsSpace: 2,
-          sections: dataMap.entries.toList().asMap().entries.map((entry) {
-            final index = entry.key;
-            final e = entry.value;
-            final category = categories.firstWhere(
-              (c) => c.id == e.key,
-              orElse: () => Category(
-                  id: '0',
-                  name: 'Unknown',
-                  emoji: '📦',
-                  type: CategoryType.expense),
-            );
-            final percent = total == 0 ? 0.0 : (e.value / total * 100);
-            return PieChartSectionData(
-              value: e.value,
-              color: colors[index % colors.length],
-              title: '${category.emoji}\n${percent.toStringAsFixed(0)}%',
-              radius: 65,
-              titleStyle: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-
-
-      Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(AppStrings.get(
-            'total', lang),
-              style: const TextStyle(
-              fontSize: 11,
-              color: Colors.grey,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            '$currency${_formatAmount(total)}',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -0.5,
-            ),
-          ),
-        ],
-      ),
-    ],
-  );
-}
-
-  Widget _buildLegend(
-    Map<String, double> dataMap,
-    double total,
-    List<Color> colors,
-    List<Category> categories, {
-    required Color textColor,
-    required Color subColor,
+    required Map<String, double> dataMap,
+    required double total,
+    required List<Color> colors,
+    required List<Category> categories,
     required String currency,
+    required String lang,
   }) {
     final entries = dataMap.entries.toList();
-    return Column(
-      children: entries.asMap().entries.map((entry) {
-        final index = entry.key;
-        final e = entry.value;
-        final category = categories.firstWhere(
-          (c) => c.id == e.key,
-          orElse: () => Category(
-              id: '0',
-              name: 'Unknown',
-              emoji: '📦',
-              type: CategoryType.expense),
-        );
-        final percent = total == 0 ? 0.0 : (e.value / total * 100);
-        final color = colors[index % colors.length];
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
+    return Column(
+      children: [
+        Expanded(
           child: Row(
             children: [
-              Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
+              // Polar chart
+              Expanded(
+                child: PieChart(
+                  PieChartData(
+                    centerSpaceRadius: 0,
+                    sectionsSpace: 2,
+                    sections: entries.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final e = entry.value;
+                      return PieChartSectionData(
+                        value: e.value,
+                        color: colors[index % colors.length].withOpacity(0.75),
+                        title: '',
+                        radius: 50 * (e.value / total) + 20,
+                        borderSide: BorderSide(
+                          color: colors[index % colors.length], width: 1.5,
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                '${category.emoji} ${category.name}',
-                style: TextStyle(color: textColor, fontSize: 14),
-              ),
-              const Spacer(),
-              Text(
-                '$currency${_formatAmount(e.value)}',
-                style: TextStyle(color: subColor, fontSize: 12),
               ),
               const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  '${percent.toStringAsFixed(0)}%',
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
+              // Donut chart
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    PieChart(
+                      PieChartData(
+                        centerSpaceRadius: 38,
+                        sectionsSpace: 4,
+                        sections: entries.asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final e = entry.value;
+                          return PieChartSectionData(
+                            value: e.value,
+                            color: colors[index % colors.length],
+                            title: '',
+                            radius: 30,
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(AppStrings.get('total', lang),
+                            style: const TextStyle(
+                              fontSize: 9, color: Colors.grey, letterSpacing: 0.5,
+                            )),
+                        Text('$currency${_formatAmount(total)}',
+                            style: const TextStyle(
+                              fontSize: 13, fontWeight: FontWeight.w800, letterSpacing: -0.5,
+                            )),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-        );
-      }).toList(),
+        ),
+
+        const SizedBox(height: 10),
+
+        // Legend + progress bars
+        ...entries.asMap().entries.map((entry) {
+          final index = entry.key;
+          final e = entry.value;
+          final category = categories.firstWhere(
+            (c) => c.id == e.key,
+            orElse: () => Category(
+              id: '0', name: 'Unknown', emoji: '📦',
+              type: CategoryType.expense,
+            ),
+          );
+          final percent = total == 0 ? 0.0 : (e.value / total * 100);
+          final color = colors[index % colors.length];
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 5),
+            child: Row(
+              children: [
+                Container(
+                  width: 7, height: 7,
+                  decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    '${category.emoji} ${category.localizedName(lang)}',
+                    style: const TextStyle(fontSize: 10, color: Colors.grey),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                SizedBox(
+                  width: 60, height: 4,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(2),
+                    child: LinearProgressIndicator(
+                      value: percent / 100,
+                      backgroundColor: color.withOpacity(0.15),
+                      valueColor: AlwaysStoppedAnimation<Color>(color),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                SizedBox(
+                  width: 28,
+                  child: Text(
+                    '${percent.toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      fontSize: 10, fontWeight: FontWeight.w600, color: color,
+                    ),
+                    textAlign: TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ],
     );
   }
 
-
   String _formatAmount(double amount) {
-    if (amount >= 1000000) {
-      return '${(amount / 1000000).toStringAsFixed(1)}M';
-    } else if (amount >= 1000) {
-      return '${(amount / 1000).toStringAsFixed(1)}K';
-    }
+    if (amount >= 1000000) return '${(amount / 1000000).toStringAsFixed(1)}M';
+    if (amount >= 1000) return '${(amount / 1000).toStringAsFixed(1)}K';
     return amount.toStringAsFixed(0);
   }
 }

@@ -11,9 +11,6 @@ class FirestoreService {
 
   String get _uid => FirebaseAuth.instance.currentUser!.uid;
 
-  // ═══════════════════════════
-  // 📁 Collections
-  // ═══════════════════════════
   CollectionReference get _transactions =>
       _db.collection('users').doc(_uid).collection('transactions');
 
@@ -22,10 +19,6 @@ class FirestoreService {
 
   CollectionReference get _subcategories =>
       _db.collection('users').doc(_uid).collection('subcategories');
-
-  // ═══════════════════════════
-  // 💸 TRANSACTIONS
-  // ═══════════════════════════
 
   Stream<List<Txn>> transactionsStream() {
     return _transactions.snapshots().map((snapshot) {
@@ -90,10 +83,6 @@ class FirestoreService {
     await _transactions.doc(id).delete();
   }
 
-  // ═══════════════════════════
-  // 🏷️ CATEGORIES
-  // ═══════════════════════════
-
   Stream<List<Category>> categoriesStream() {
     return _categories.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
@@ -146,10 +135,6 @@ class FirestoreService {
     await _categories.doc(id).delete();
   }
 
-  // ═══════════════════════════
-  // 📂 SUBCATEGORIES
-  // ═══════════════════════════
-
   Stream<List<SubCategory>> subcategoriesStream() {
     return _subcategories.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
@@ -177,10 +162,6 @@ class FirestoreService {
       'parentId': parentId,
     });
   }
-
-  // ═══════════════════════════
-  // 🗑️ CLEAR ALL DATA
-  // ═══════════════════════════
 
   Future<void> clearAllData() async {
     final txns = await _transactions.get();
