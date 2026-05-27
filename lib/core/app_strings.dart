@@ -100,6 +100,7 @@ class AppStrings {
       'over_budget': 'Over budget!',
       'budget_used': 'used',
       'delete_budget': 'Remove Budget',
+      'net_balance': 'Net Balance'
     },
     'mn': {
       'settings': 'Тохиргоо',
