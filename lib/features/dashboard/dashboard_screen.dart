@@ -9,6 +9,7 @@ import '../../data/models/category_type.dart';
 import '../../data/models/category.dart';
 import '../../core/language_provider.dart';
 import '../../core/app_strings.dart';
+import '../budget/budget_provider.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -21,6 +22,7 @@ class DashboardScreen extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
     final currency = ref.watch(currencyProvider);
     final lang = ref.watch(languageProvider);
+    final budgets = ref.watch(budgetProvider);
 
     double income = 0;
     double expense = 0;
@@ -180,6 +182,110 @@ class DashboardScreen extends ConsumerWidget {
             ),
 
             const SizedBox(height: 32),
+            if (budgets.isNotEmpty) ...[
+  Text(
+    AppStrings.get('monthly_budget', lang),
+    style: TextStyle(
+      color: textColor, fontSize: 18,
+      fontWeight: FontWeight.w700, letterSpacing: -0.3,
+    ),
+  ),
+  const SizedBox(height: 12),
+  ...budgets.entries.map((entry) {
+    final category = categories.firstWhere(
+      (c) => c.id == entry.key,
+      orElse: () => Category(
+        id: '0', name: 'Unknown', emoji: '📦',
+        type: CategoryType.expense,
+      ),
+    );
+    final budgetAmount = entry.value;
+    final spent = expenseMap[entry.key] ?? 0;
+    final percent = budgetAmount == 0 ? 0.0 : (spent / budgetAmount);
+    final isOver = percent >= 1.0;
+    final progressColor = isOver
+        ? Colors.red
+        : percent > 0.8
+            ? Colors.orange
+            : const Color(0xFF6C63FF);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: isOver
+            ? Border.all(color: Colors.red.withOpacity(0.3), width: 1)
+            : null,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(category.emoji, style: const TextStyle(fontSize: 20)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  category.localizedName(lang),
+                  style: TextStyle(
+                      color: textColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14),
+                ),
+              ),
+              if (isOver)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    AppStrings.get('over_budget', lang),
+                    style: const TextStyle(
+                        color: Colors.red,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: percent.clamp(0.0, 1.0),
+              backgroundColor: progressColor.withOpacity(0.12),
+              valueColor: AlwaysStoppedAnimation<Color>(progressColor),
+              minHeight: 6,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '$currency${_formatAmount(spent)} ${AppStrings.get('budget_used', lang)}',
+                style: TextStyle(
+                    color: progressColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500),
+              ),
+              Text(
+                '$currency${_formatAmount(budgetAmount)}',
+                style: TextStyle(color: subColor, fontSize: 12),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }),
+  const SizedBox(height: 20),
+],
           ],
         ),
       ),

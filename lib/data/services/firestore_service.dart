@@ -6,6 +6,7 @@ import '../models/category.dart';
 import '../models/subcategory.dart';
 import '../models/category_type.dart';
 
+
 class FirestoreService {
   final _db = FirebaseFirestore.instance;
 
@@ -47,6 +48,7 @@ class FirestoreService {
     required DateTime date,
     String? note,
     String? subCategoryId,
+    String? imageUrl,
   }) async {
     await _transactions.doc(id).set({
       'id': id,
@@ -57,6 +59,7 @@ class FirestoreService {
       'note': note,
       'subCategoryId': subCategoryId,
       'createdAt': FieldValue.serverTimestamp(),
+      
     });
   }
 
@@ -68,6 +71,7 @@ class FirestoreService {
     required DateTime date,
     String? note,
     String? subCategoryId,
+    String? imageUrl,
   }) async {
     await _transactions.doc(id).update({
       'type': type,
@@ -78,7 +82,6 @@ class FirestoreService {
       'subCategoryId': subCategoryId,
     });
   }
-
   Future<void> deleteTransaction(String id) async {
     await _transactions.doc(id).delete();
   }

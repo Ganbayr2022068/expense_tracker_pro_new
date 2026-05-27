@@ -252,7 +252,6 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
               ),
 
               const SizedBox(height: 12),
-
               GestureDetector(
                 onTap: _pickDate,
                 child: Container(

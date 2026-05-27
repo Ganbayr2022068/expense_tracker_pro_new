@@ -7,6 +7,9 @@ import '../../core/theme_provider.dart';
 import '../../core/language_provider.dart';
 import '../../core/app_strings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../budget/budget_provider.dart';
+import '../categories/categories_provider.dart';
+import '../../data/models/category_type.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -101,6 +104,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         for (final doc in cats.docs) await doc.reference.delete();
         final subs = await userDoc.collection('subcategories').get();
         for (final doc in subs.docs) await doc.reference.delete();
+        final budgets = await userDoc.collection('budgets').get();
+        for (final doc in budgets.docs) await doc.reference.delete();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(AppStrings.get('data_cleared', lang)),
@@ -388,6 +393,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                   const SizedBox(height: 20),
 
+                  // ── BUDGET ──
+                  _sectionTitle(AppStrings.get('budget', lang), textColor),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                        color: cardColor,
+                        borderRadius: BorderRadius.circular(16)),
+                    child: ListTile(
+                      leading: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(Icons.account_balance_wallet_outlined,
+                            color: Colors.orange, size: 20),
+                      ),
+                      title: Text(AppStrings.get('monthly_budget', lang),
+                          style: TextStyle(
+                              color: textColor, fontWeight: FontWeight.w500)),
+                      subtitle: Text(AppStrings.get('set_budget', lang),
+                          style: TextStyle(color: subColor, fontSize: 12)),
+                      trailing: Icon(Icons.chevron_right, color: subColor),
+                      onTap: () =>
+                          _showBudgetScreen(cardColor, textColor, subColor),
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
                   // ── DATA ──
                   _sectionTitle(AppStrings.get('data', lang), textColor),
                   const SizedBox(height: 8),
@@ -441,8 +476,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   color: textColor,
                                   fontWeight: FontWeight.w500)),
                           trailing: Text(_version,
-                              style:
-                                  TextStyle(color: subColor, fontSize: 13)),
+                              style: TextStyle(color: subColor, fontSize: 13)),
                         ),
                         Divider(
                             height: 1,
@@ -464,8 +498,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                                   color: textColor,
                                   fontWeight: FontWeight.w500)),
                           trailing: Text('Expense Tracker Pro',
-                              style:
-                                  TextStyle(color: subColor, fontSize: 13)),
+                              style: TextStyle(color: subColor, fontSize: 13)),
                         ),
                       ],
                     ),
@@ -582,6 +615,147 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     },
                   )),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showBudgetScreen(Color cardColor, Color textColor, Color subColor) {
+    final lang = ref.read(languageProvider);
+    final categories = ref.read(categoriesProvider);
+    final budgets = ref.read(budgetProvider);
+    final expenseCategories =
+        categories.where((c) => c.type == CategoryType.expense).toList();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: cardColor,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.75,
+        maxChildSize: 0.95,
+        minChildSize: 0.5,
+        expand: false,
+        builder: (_, scrollController) => StatefulBuilder(
+          builder: (context, setModalState) => SingleChildScrollView(
+            controller: scrollController,
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(AppStrings.get('monthly_budget', lang),
+                    style: TextStyle(
+                        color: textColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700)),
+                const SizedBox(height: 4),
+                Text(
+                  lang == 'mn'
+                      ? 'Дүн оруулаад Enter дарна уу'
+                      : 'Enter amount and press Enter',
+                  style: TextStyle(color: subColor, fontSize: 12),
+                ),
+                const SizedBox(height: 16),
+                ...expenseCategories.map((category) {
+                  final budget = budgets[category.id];
+                  final controller = TextEditingController(
+                    text: budget != null ? budget.toInt().toString() : '',
+                  );
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: cardColor,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: budget != null
+                              ? Colors.orange.withOpacity(0.4)
+                              : Colors.grey.withOpacity(0.15),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(category.emoji,
+                              style: const TextStyle(fontSize: 24)),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  category.localizedName(lang),
+                                  style: TextStyle(
+                                      color: textColor,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14),
+                                ),
+                                const SizedBox(height: 4),
+                                TextField(
+                                  controller: controller,
+                                  keyboardType: TextInputType.number,
+                                  style:
+                                      TextStyle(color: textColor, fontSize: 13),
+                                  decoration: InputDecoration(
+                                    hintText: lang == 'mn'
+                                        ? 'Төсвийн дүн...'
+                                        : 'Budget amount...',
+                                    hintStyle:
+                                        TextStyle(color: subColor, fontSize: 12),
+                                    isDense: true,
+                                    border: InputBorder.none,
+                                    suffixText: '₮',
+                                    suffixStyle: const TextStyle(
+                                        color: Colors.orange,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  onSubmitted: (value) async {
+                                    final amount = double.tryParse(value);
+                                    if (amount != null && amount > 0) {
+                                      await ref
+                                          .read(budgetProvider.notifier)
+                                          .setBudget(category.id, amount);
+                                      setModalState(() {});
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (budget != null)
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline,
+                                  color: Colors.red, size: 20),
+                              onPressed: () async {
+                                await ref
+                                    .read(budgetProvider.notifier)
+                                    .deleteBudget(category.id);
+                                setModalState(() {});
+                              },
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
