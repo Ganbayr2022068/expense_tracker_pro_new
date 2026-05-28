@@ -8,6 +8,9 @@ import '../../data/models/category.dart';
 import '../../core/language_provider.dart';
 import '../../core/app_strings.dart';
 import '../../core/currency_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class MonthlyReportScreen extends ConsumerStatefulWidget {
   const MonthlyReportScreen({super.key});
@@ -130,6 +133,22 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
             fontWeight: FontWeight.w700,
           ),
         ),
+          actions: [
+    IconButton(
+      icon: const Icon(Icons.picture_as_pdf_outlined,
+          color: Color(0xFF6C63FF)),
+      onPressed: () => _exportPdf(
+        monthTxns: monthTxns,
+        categories: categories,
+        income: income,
+        expense: expense,
+        balance: balance,
+        expenseMap: expenseMap,
+        currency: currency,
+        lang: lang,
+      ),
+    ),
+  ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
@@ -615,4 +634,316 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
       ],
     );
   }
+  Future<void> _exportPdf({
+  required List monthTxns,
+  required List categories,
+  required double income,
+  required double expense,
+  required double balance,
+  required Map<String, double> expenseMap,
+  required String currency,
+  required String lang,
+}) async {
+  final pdf = pw.Document();
+
+  final monthTitle =
+      '${_monthName(_selectedMonth.month, lang)} ${_selectedMonth.year}';
+
+  // Категори нэр авах helper
+  String getCategoryName(String categoryId) {
+    try {
+      final cat = categories.firstWhere((c) => c.id == categoryId);
+      return '${cat.emoji} ${cat.localizedName(lang)}';
+    } catch (_) {
+      return '📦 Unknown';
+    }
+  }
+
+  pdf.addPage(
+    pw.MultiPage(
+      pageFormat: PdfPageFormat.a4,
+      margin: const pw.EdgeInsets.all(32),
+      build: (pw.Context context) => [
+
+        // ── Header ──
+        pw.Container(
+          padding: const pw.EdgeInsets.all(20),
+          decoration: pw.BoxDecoration(
+            color: PdfColor.fromHex('6C63FF'),
+            borderRadius: pw.BorderRadius.circular(12),
+          ),
+          child: pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  pw.Text(
+                    lang == 'mn' ? 'Сарын тайлан' : 'Monthly Report',
+                    style: pw.TextStyle(
+                      color: PdfColors.white,
+                      fontSize: 22,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                  pw.SizedBox(height: 4),
+                  pw.Text(
+                    monthTitle,
+                    style: const pw.TextStyle(
+                      color: PdfColors.white,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+              pw.Text(
+                'Expense Tracker Pro',
+                style: const pw.TextStyle(
+                  color: PdfColors.white,
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        pw.SizedBox(height: 24),
+
+        // ── Summary ──
+        pw.Row(
+          children: [
+            pw.Expanded(
+              child: _pdfStatBox(
+                label: lang == 'mn' ? 'Орлого' : 'Income',
+                amount: '$currency${_fmt(income)}',
+                color: PdfColor.fromHex('43E97B'),
+              ),
+            ),
+            pw.SizedBox(width: 12),
+            pw.Expanded(
+              child: _pdfStatBox(
+                label: lang == 'mn' ? 'Зарлага' : 'Expense',
+                amount: '$currency${_fmt(expense)}',
+                color: PdfColor.fromHex('FF6584'),
+              ),
+            ),
+            pw.SizedBox(width: 12),
+            pw.Expanded(
+              child: _pdfStatBox(
+                label: lang == 'mn' ? 'Үлдэгдэл' : 'Balance',
+                amount:
+                    '${balance >= 0 ? '+' : ''}$currency${_fmt(balance)}',
+                color: balance >= 0
+                    ? PdfColor.fromHex('6C63FF')
+                    : PdfColor.fromHex('FF6584'),
+              ),
+            ),
+          ],
+        ),
+
+        pw.SizedBox(height: 24),
+
+        // ── Expense by category ──
+        if (expenseMap.isNotEmpty) ...[
+          pw.Text(
+            lang == 'mn' ? 'Ангиллаар зарлага' : 'Expense by Category',
+            style: pw.TextStyle(
+              fontSize: 14,
+              fontWeight: pw.FontWeight.bold,
+              color: PdfColor.fromHex('1A1A2E'),
+            ),
+          ),
+          pw.SizedBox(height: 12),
+          pw.Table(
+            border: pw.TableBorder.all(
+              color: PdfColor.fromHex('E8E8E8'),
+              width: 0.5,
+            ),
+            children: [
+              // Header
+              pw.TableRow(
+                decoration: pw.BoxDecoration(
+                  color: PdfColor.fromHex('F5F5FF'),
+                ),
+                children: [
+                  _pdfTableCell(
+                      lang == 'mn' ? 'Ангилал' : 'Category',
+                      isHeader: true),
+                  _pdfTableCell(
+                      lang == 'mn' ? 'Дүн' : 'Amount',
+                      isHeader: true),
+                  _pdfTableCell('%', isHeader: true),
+                ],
+              ),
+              // Rows
+              ...expenseMap.entries.map((e) {
+                final percent = expense == 0
+                    ? 0.0
+                    : (e.value / expense * 100);
+                return pw.TableRow(
+                  children: [
+                    _pdfTableCell(getCategoryName(e.key)),
+                    _pdfTableCell('$currency${_fmt(e.value)}'),
+                    _pdfTableCell(
+                        '${percent.toStringAsFixed(1)}%'),
+                  ],
+                );
+              }),
+            ],
+          ),
+          pw.SizedBox(height: 24),
+        ],
+
+        // ── Transactions list ──
+        pw.Text(
+          lang == 'mn' ? 'Гүйлгээний жагсаалт' : 'Transaction List',
+          style: pw.TextStyle(
+            fontSize: 14,
+            fontWeight: pw.FontWeight.bold,
+            color: PdfColor.fromHex('1A1A2E'),
+          ),
+        ),
+        pw.SizedBox(height: 12),
+        pw.Table(
+          border: pw.TableBorder.all(
+            color: PdfColor.fromHex('E8E8E8'),
+            width: 0.5,
+          ),
+          columnWidths: {
+            0: const pw.FlexColumnWidth(2),
+            1: const pw.FlexColumnWidth(3),
+            2: const pw.FlexColumnWidth(2),
+            3: const pw.FlexColumnWidth(1.5),
+          },
+          children: [
+            // Header
+            pw.TableRow(
+              decoration: pw.BoxDecoration(
+                color: PdfColor.fromHex('F5F5FF'),
+              ),
+              children: [
+                _pdfTableCell(
+                    lang == 'mn' ? 'Огноо' : 'Date',
+                    isHeader: true),
+                _pdfTableCell(
+                    lang == 'mn' ? 'Ангилал' : 'Category',
+                    isHeader: true),
+                _pdfTableCell(
+                    lang == 'mn' ? 'Дүн' : 'Amount',
+                    isHeader: true),
+                _pdfTableCell(
+                    lang == 'mn' ? 'Төрөл' : 'Type',
+                    isHeader: true),
+              ],
+            ),
+            // Rows
+            ...monthTxns.map((t) {
+              final isIncome = t.type == 'income';
+              final dateStr =
+                  '${t.date.year}/${t.date.month.toString().padLeft(2, '0')}/${t.date.day.toString().padLeft(2, '0')}';
+              return pw.TableRow(
+                children: [
+                  _pdfTableCell(dateStr),
+                  _pdfTableCell(getCategoryName(t.categoryId)),
+                  _pdfTableCell(
+                    '${isIncome ? '+' : '-'}$currency${_fmt(t.amount)}',
+                    color: isIncome
+                        ? PdfColor.fromHex('27AE60')
+                        : PdfColor.fromHex('E74C3C'),
+                  ),
+                  _pdfTableCell(
+                    isIncome
+                        ? (lang == 'mn' ? 'Орлого' : 'Income')
+                        : (lang == 'mn' ? 'Зарлага' : 'Expense'),
+                  ),
+                ],
+              );
+            }),
+          ],
+        ),
+
+        pw.SizedBox(height: 24),
+
+        // ── Footer ──
+        pw.Divider(color: PdfColor.fromHex('E8E8E8')),
+        pw.SizedBox(height: 8),
+        pw.Row(
+          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+          children: [
+            pw.Text(
+              'Expense Tracker Pro',
+              style: const pw.TextStyle(
+                color: PdfColors.grey,
+                fontSize: 10,
+              ),
+            ),
+            pw.Text(
+              '${DateTime.now().year}/${DateTime.now().month.toString().padLeft(2, '0')}/${DateTime.now().day.toString().padLeft(2, '0')}',
+              style: const pw.TextStyle(
+                color: PdfColors.grey,
+                fontSize: 10,
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+
+  // PDF харуулах / хадгалах
+  await Printing.layoutPdf(
+    onLayout: (PdfPageFormat format) async => pdf.save(),
+    name: 'report_${_selectedMonth.year}_${_selectedMonth.month}.pdf',
+  );
+}
+
+// PDF helper widgets
+pw.Widget _pdfStatBox({
+  required String label,
+  required String amount,
+  required PdfColor color,
+}) {
+  return pw.Container(
+    padding: const pw.EdgeInsets.all(12),
+    decoration: pw.BoxDecoration(
+      border: pw.Border.all(color: color, width: 1.5),
+      borderRadius: pw.BorderRadius.circular(8),
+    ),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Text(label,
+            style: pw.TextStyle(
+                color: color,
+                fontSize: 11,
+                fontWeight: pw.FontWeight.bold)),
+        pw.SizedBox(height: 4),
+        pw.Text(amount,
+            style: pw.TextStyle(
+                fontSize: 16,
+                fontWeight: pw.FontWeight.bold,
+                color: PdfColor.fromHex('1A1A2E'))),
+      ],
+    ),
+  );
+}
+
+pw.Widget _pdfTableCell(
+  String text, {
+  bool isHeader = false,
+  PdfColor? color,
+}) {
+  return pw.Padding(
+    padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+    child: pw.Text(
+      text,
+      style: pw.TextStyle(
+        fontSize: isHeader ? 11 : 10,
+        fontWeight:
+            isHeader ? pw.FontWeight.bold : pw.FontWeight.normal,
+        color: color ?? PdfColor.fromHex('1A1A2E'),
+      ),
+    ),
+  );
+}
 }
