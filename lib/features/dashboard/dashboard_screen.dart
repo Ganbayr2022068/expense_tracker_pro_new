@@ -375,30 +375,6 @@ class DashboardScreen extends ConsumerWidget {
         Expanded(
           child: Row(
             children: [
-              // Polar chart
-              Expanded(
-                child: PieChart(
-                  PieChartData(
-                    centerSpaceRadius: 0,
-                    sectionsSpace: 2,
-                    sections: entries.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final e = entry.value;
-                      return PieChartSectionData(
-                        value: e.value,
-                        color: colors[index % colors.length].withOpacity(0.75),
-                        title: '',
-                        radius: 50 * (e.value / total) + 20,
-                        borderSide: BorderSide(
-                          color: colors[index % colors.length], width: 1.5,
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              // Donut chart
               Expanded(
                 child: Stack(
                   alignment: Alignment.center,

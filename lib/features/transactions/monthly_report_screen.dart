@@ -65,8 +65,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
     final categories = ref.watch(categoriesProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bgColor =
-        isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF7F8FA);
+    final bgColor = isDark ? const Color(0xFF0F0F0F) : const Color(0xFFF7F8FA);
     final cardColor = isDark ? const Color(0xFF1C1C1E) : Colors.white;
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A2E);
     final subColor = isDark ? Colors.white38 : Colors.grey;
@@ -90,8 +89,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
     final Map<String, double> expenseMap = {};
     for (final t in monthTxns) {
       if (t.type == 'expense') {
-        expenseMap[t.categoryId] =
-            (expenseMap[t.categoryId] ?? 0) + t.amount;
+        expenseMap[t.categoryId] = (expenseMap[t.categoryId] ?? 0) + t.amount;
       }
     }
 
@@ -113,8 +111,8 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
     ];
 
     final now = DateTime.now();
-    final isCurrentMonth = _selectedMonth.year == now.year &&
-        _selectedMonth.month == now.month;
+    final isCurrentMonth =
+        _selectedMonth.year == now.year && _selectedMonth.month == now.month;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -133,22 +131,22 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
             fontWeight: FontWeight.w700,
           ),
         ),
-          actions: [
-    IconButton(
-      icon: const Icon(Icons.picture_as_pdf_outlined,
-          color: Color(0xFF6C63FF)),
-      onPressed: () => _exportPdf(
-        monthTxns: monthTxns,
-        categories: categories,
-        income: income,
-        expense: expense,
-        balance: balance,
-        expenseMap: expenseMap,
-        currency: currency,
-        lang: lang,
-      ),
-    ),
-  ],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.picture_as_pdf_outlined,
+                color: Color(0xFF6C63FF)),
+            onPressed: () => _exportPdf(
+              monthTxns: monthTxns,
+              categories: categories,
+              income: income,
+              expense: expense,
+              balance: balance,
+              expenseMap: expenseMap,
+              currency: currency,
+              lang: lang,
+            ),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
@@ -239,9 +237,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: (balance >= 0
-                            ? const Color(0xFF6C63FF)
-                            : Colors.red)
+                    color: (balance >= 0 ? const Color(0xFF6C63FF) : Colors.red)
                         .withOpacity(0.35),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
@@ -261,11 +257,12 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-  balance >= 0
-      ? (lang == 'mn' ? '▲ Хэмнэлт' : '▲ Savings')
-      : (lang == 'mn' ? '▼ Алдагдал' : '▼ Loss'),
-  style: const TextStyle(color: Colors.white54, fontSize: 11),
-),
+                        balance >= 0
+                            ? (lang == 'mn' ? '▲ Хэмнэлт' : '▲ Savings')
+                            : (lang == 'mn' ? '▼ Алдагдал' : '▼ Loss'),
+                        style: const TextStyle(
+                            color: Colors.white54, fontSize: 11),
+                      ),
                     ],
                   ),
                   Text(
@@ -320,12 +317,10 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.bar_chart_outlined,
-                              size: 36,
-                              color: subColor.withOpacity(0.4)),
+                              size: 36, color: subColor.withOpacity(0.4)),
                           const SizedBox(height: 8),
                           Text(AppStrings.get('no_data', lang),
-                              style:
-                                  TextStyle(color: subColor, fontSize: 13)),
+                              style: TextStyle(color: subColor, fontSize: 13)),
                         ],
                       ),
                     )
@@ -336,8 +331,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
                           ...dailyExpense.values,
                           ...dailyIncome.values,
                           1
-                        ].reduce((a, b) => a > b ? a : b) *
-                            1.3,
+                        ].reduce((a, b) => a > b ? a : b) * 1.3,
                         barTouchData: BarTouchData(
                           enabled: true,
                           touchTooltipData: BarTouchTooltipData(
@@ -372,8 +366,8 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
                                   padding: const EdgeInsets.only(top: 4),
                                   child: Text(
                                     day.toString(),
-                                    style: TextStyle(
-                                        fontSize: 9, color: subColor),
+                                    style:
+                                        TextStyle(fontSize: 9, color: subColor),
                                   ),
                                 );
                               },
@@ -495,8 +489,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
                           ),
                           Text(
                             '$currency${_fmt(e.value)}',
-                            style: TextStyle(
-                                color: subColor, fontSize: 12),
+                            style: TextStyle(color: subColor, fontSize: 12),
                           ),
                           const SizedBox(width: 8),
                           Container(
@@ -528,8 +521,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
                               LinearProgressIndicator(
                             value: value,
                             backgroundColor: color.withOpacity(0.1),
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(color),
+                            valueColor: AlwaysStoppedAnimation<Color>(color),
                             minHeight: 6,
                           ),
                         ),
@@ -548,8 +540,7 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
                   child: Column(
                     children: [
                       Icon(Icons.receipt_long_outlined,
-                          size: 56,
-                          color: subColor.withOpacity(0.3)),
+                          size: 56, color: subColor.withOpacity(0.3)),
                       const SizedBox(height: 12),
                       Text(
                         AppStrings.get('no_transactions', lang),
@@ -629,127 +620,190 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
           ),
         ),
         const SizedBox(width: 4),
-        Text(label,
-            style: const TextStyle(fontSize: 10, color: Colors.grey)),
+        Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey)),
       ],
     );
   }
+
   Future<void> _exportPdf({
-  required List monthTxns,
-  required List categories,
-  required double income,
-  required double expense,
-  required double balance,
-  required Map<String, double> expenseMap,
-  required String currency,
-  required String lang,
-}) async {
-  final pdf = pw.Document();
+    required List monthTxns,
+    required List categories,
+    required double income,
+    required double expense,
+    required double balance,
+    required Map<String, double> expenseMap,
+    required String currency,
+    required String lang,
+  }) async {
+    final pdf = pw.Document();
 
-  final monthTitle =
-      '${_monthName(_selectedMonth.month, lang)} ${_selectedMonth.year}';
+    // Монгол фонт татах
+    final font = await PdfGoogleFonts.notoSansRegular();
+    final fontBold = await PdfGoogleFonts.notoSansBold();
 
-  // Категори нэр авах helper
-  String getCategoryName(String categoryId) {
-    try {
-      final cat = categories.firstWhere((c) => c.id == categoryId);
-      return '${cat.emoji} ${cat.localizedName(lang)}';
-    } catch (_) {
-      return '📦 Unknown';
+    final monthTitle =
+        '${_monthName(_selectedMonth.month, lang)} ${_selectedMonth.year}';
+
+    String getCategoryName(String categoryId) {
+      try {
+        final cat = categories.firstWhere((c) => c.id == categoryId);
+        return cat.localizedName(lang);
+      } catch (_) {
+        return 'Unknown';
+      }
     }
-  }
 
-  pdf.addPage(
-    pw.MultiPage(
-      pageFormat: PdfPageFormat.a4,
-      margin: const pw.EdgeInsets.all(32),
-      build: (pw.Context context) => [
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(32),
+        build: (pw.Context context) => [
 
-        // ── Header ──
-        pw.Container(
-          padding: const pw.EdgeInsets.all(20),
-          decoration: pw.BoxDecoration(
-            color: PdfColor.fromHex('6C63FF'),
-            borderRadius: pw.BorderRadius.circular(12),
+          // ── Header ──
+          pw.Container(
+            padding: const pw.EdgeInsets.all(20),
+            decoration: pw.BoxDecoration(
+              color: PdfColor.fromHex('6C63FF'),
+              borderRadius: pw.BorderRadius.circular(12),
+            ),
+            child: pw.Row(
+              mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+              children: [
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      lang == 'mn' ? 'Сарын тайлан' : 'Monthly Report',
+                      style: pw.TextStyle(
+                        color: PdfColors.white,
+                        fontSize: 22,
+                        fontWeight: pw.FontWeight.bold,
+                        font: fontBold,
+                      ),
+                    ),
+                    pw.SizedBox(height: 4),
+                    pw.Text(
+                      monthTitle,
+                      style: pw.TextStyle(
+                        color: PdfColors.white,
+                        fontSize: 14,
+                        font: font,
+                      ),
+                    ),
+                  ],
+                ),
+                pw.Text(
+                  'Expense Tracker Pro',
+                  style: pw.TextStyle(
+                    color: PdfColors.white,
+                    fontSize: 11,
+                    font: font,
+                  ),
+                ),
+              ],
+            ),
           ),
-          child: pw.Row(
-            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+
+          pw.SizedBox(height: 24),
+
+          // ── Summary ──
+          pw.Row(
             children: [
-              pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Text(
-                    lang == 'mn' ? 'Сарын тайлан' : 'Monthly Report',
-                    style: pw.TextStyle(
-                      color: PdfColors.white,
-                      fontSize: 22,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
-                  ),
-                  pw.SizedBox(height: 4),
-                  pw.Text(
-                    monthTitle,
-                    style: const pw.TextStyle(
-                      color: PdfColors.white,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
+              pw.Expanded(
+                child: _pdfStatBox(
+                  label: lang == 'mn' ? 'Орлого' : 'Income',
+                  amount: '$currency${_fmt(income)}',
+                  color: PdfColor.fromHex('43E97B'),
+                  font: font,
+                  fontBold: fontBold,
+                ),
               ),
-              pw.Text(
-                'Expense Tracker Pro',
-                style: const pw.TextStyle(
-                  color: PdfColors.white,
-                  fontSize: 11,
+              pw.SizedBox(width: 12),
+              pw.Expanded(
+                child: _pdfStatBox(
+                  label: lang == 'mn' ? 'Зарлага' : 'Expense',
+                  amount: '$currency${_fmt(expense)}',
+                  color: PdfColor.fromHex('FF6584'),
+                  font: font,
+                  fontBold: fontBold,
+                ),
+              ),
+              pw.SizedBox(width: 12),
+              pw.Expanded(
+                child: _pdfStatBox(
+                  label: lang == 'mn' ? 'Үлдэгдэл' : 'Balance',
+                  amount: '${balance >= 0 ? '+' : ''}$currency${_fmt(balance)}',
+                  color: balance >= 0
+                      ? PdfColor.fromHex('6C63FF')
+                      : PdfColor.fromHex('FF6584'),
+                  font: font,
+                  fontBold: fontBold,
                 ),
               ),
             ],
           ),
-        ),
 
-        pw.SizedBox(height: 24),
+          pw.SizedBox(height: 24),
 
-        // ── Summary ──
-        pw.Row(
-          children: [
-            pw.Expanded(
-              child: _pdfStatBox(
-                label: lang == 'mn' ? 'Орлого' : 'Income',
-                amount: '$currency${_fmt(income)}',
-                color: PdfColor.fromHex('43E97B'),
+          // ── Expense by category ──
+          if (expenseMap.isNotEmpty) ...[
+            pw.Text(
+              lang == 'mn' ? 'Ангиллаар зарлага' : 'Expense by Category',
+              style: pw.TextStyle(
+                fontSize: 14,
+                fontWeight: pw.FontWeight.bold,
+                font: fontBold,
+                color: PdfColor.fromHex('1A1A2E'),
               ),
             ),
-            pw.SizedBox(width: 12),
-            pw.Expanded(
-              child: _pdfStatBox(
-                label: lang == 'mn' ? 'Зарлага' : 'Expense',
-                amount: '$currency${_fmt(expense)}',
-                color: PdfColor.fromHex('FF6584'),
+            pw.SizedBox(height: 12),
+            pw.Table(
+              border: pw.TableBorder.all(
+                color: PdfColor.fromHex('E8E8E8'),
+                width: 0.5,
               ),
+              children: [
+                pw.TableRow(
+                  decoration: pw.BoxDecoration(
+                    color: PdfColor.fromHex('F5F5FF'),
+                  ),
+                  children: [
+                    _pdfTableCell(
+                        lang == 'mn' ? 'Ангилал' : 'Category',
+                        isHeader: true, font: font, fontBold: fontBold),
+                    _pdfTableCell(
+                        lang == 'mn' ? 'Дүн' : 'Amount',
+                        isHeader: true, font: font, fontBold: fontBold),
+                    _pdfTableCell('%',
+                        isHeader: true, font: font, fontBold: fontBold),
+                  ],
+                ),
+                ...expenseMap.entries.map((e) {
+                  final percent =
+                      expense == 0 ? 0.0 : (e.value / expense * 100);
+                  return pw.TableRow(
+                    children: [
+                      _pdfTableCell(getCategoryName(e.key),
+                          font: font, fontBold: fontBold),
+                      _pdfTableCell('$currency${_fmt(e.value)}',
+                          font: font, fontBold: fontBold),
+                      _pdfTableCell('${percent.toStringAsFixed(1)}%',
+                          font: font, fontBold: fontBold),
+                    ],
+                  );
+                }),
+              ],
             ),
-            pw.SizedBox(width: 12),
-            pw.Expanded(
-              child: _pdfStatBox(
-                label: lang == 'mn' ? 'Үлдэгдэл' : 'Balance',
-                amount:
-                    '${balance >= 0 ? '+' : ''}$currency${_fmt(balance)}',
-                color: balance >= 0
-                    ? PdfColor.fromHex('6C63FF')
-                    : PdfColor.fromHex('FF6584'),
-              ),
-            ),
+            pw.SizedBox(height: 24),
           ],
-        ),
 
-        pw.SizedBox(height: 24),
-
-        // ── Expense by category ──
-        if (expenseMap.isNotEmpty) ...[
+          // ── Transactions list ──
           pw.Text(
-            lang == 'mn' ? 'Ангиллаар зарлага' : 'Expense by Category',
+            lang == 'mn' ? 'Гүйлгээний жагсаалт' : 'Transaction List',
             style: pw.TextStyle(
               fontSize: 14,
               fontWeight: pw.FontWeight.bold,
+              font: fontBold,
               color: PdfColor.fromHex('1A1A2E'),
             ),
           ),
@@ -759,191 +813,141 @@ class _MonthlyReportScreenState extends ConsumerState<MonthlyReportScreen> {
               color: PdfColor.fromHex('E8E8E8'),
               width: 0.5,
             ),
+            columnWidths: {
+              0: const pw.FlexColumnWidth(2),
+              1: const pw.FlexColumnWidth(3),
+              2: const pw.FlexColumnWidth(2),
+              3: const pw.FlexColumnWidth(1.5),
+            },
             children: [
-              // Header
               pw.TableRow(
                 decoration: pw.BoxDecoration(
                   color: PdfColor.fromHex('F5F5FF'),
                 ),
                 children: [
-                  _pdfTableCell(
-                      lang == 'mn' ? 'Ангилал' : 'Category',
-                      isHeader: true),
-                  _pdfTableCell(
-                      lang == 'mn' ? 'Дүн' : 'Amount',
-                      isHeader: true),
-                  _pdfTableCell('%', isHeader: true),
+                  _pdfTableCell(lang == 'mn' ? 'Огноо' : 'Date',
+                      isHeader: true, font: font, fontBold: fontBold),
+                  _pdfTableCell(lang == 'mn' ? 'Ангилал' : 'Category',
+                      isHeader: true, font: font, fontBold: fontBold),
+                  _pdfTableCell(lang == 'mn' ? 'Дүн' : 'Amount',
+                      isHeader: true, font: font, fontBold: fontBold),
+                  _pdfTableCell(lang == 'mn' ? 'Төрөл' : 'Type',
+                      isHeader: true, font: font, fontBold: fontBold),
                 ],
               ),
-              // Rows
-              ...expenseMap.entries.map((e) {
-                final percent = expense == 0
-                    ? 0.0
-                    : (e.value / expense * 100);
+              ...monthTxns.map((t) {
+                final isIncome = t.type == 'income';
+                final dateStr =
+                    '${t.date.year}/${t.date.month.toString().padLeft(2, '0')}/${t.date.day.toString().padLeft(2, '0')}';
                 return pw.TableRow(
                   children: [
-                    _pdfTableCell(getCategoryName(e.key)),
-                    _pdfTableCell('$currency${_fmt(e.value)}'),
+                    _pdfTableCell(dateStr, font: font, fontBold: fontBold),
+                    _pdfTableCell(getCategoryName(t.categoryId),
+                        font: font, fontBold: fontBold),
                     _pdfTableCell(
-                        '${percent.toStringAsFixed(1)}%'),
+                      '${isIncome ? '+' : '-'}$currency${_fmt(t.amount)}',
+                      color: isIncome
+                          ? PdfColor.fromHex('27AE60')
+                          : PdfColor.fromHex('E74C3C'),
+                      font: font,
+                      fontBold: fontBold,
+                    ),
+                    _pdfTableCell(
+                      isIncome
+                          ? (lang == 'mn' ? 'Орлого' : 'Income')
+                          : (lang == 'mn' ? 'Зарлага' : 'Expense'),
+                      font: font,
+                      fontBold: fontBold,
+                    ),
                   ],
                 );
               }),
             ],
           ),
+
           pw.SizedBox(height: 24),
+
+          // ── Footer ──
+          pw.Divider(color: PdfColor.fromHex('E8E8E8')),
+          pw.SizedBox(height: 8),
+          pw.Row(
+            mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+            children: [
+              pw.Text(
+                'Expense Tracker Pro',
+                style: pw.TextStyle(
+                    color: PdfColors.grey, fontSize: 10, font: font),
+              ),
+              pw.Text(
+                '${DateTime.now().year}/${DateTime.now().month.toString().padLeft(2, '0')}/${DateTime.now().day.toString().padLeft(2, '0')}',
+                style: pw.TextStyle(
+                    color: PdfColors.grey, fontSize: 10, font: font),
+              ),
+            ],
+          ),
         ],
-
-        // ── Transactions list ──
-        pw.Text(
-          lang == 'mn' ? 'Гүйлгээний жагсаалт' : 'Transaction List',
-          style: pw.TextStyle(
-            fontSize: 14,
-            fontWeight: pw.FontWeight.bold,
-            color: PdfColor.fromHex('1A1A2E'),
-          ),
-        ),
-        pw.SizedBox(height: 12),
-        pw.Table(
-          border: pw.TableBorder.all(
-            color: PdfColor.fromHex('E8E8E8'),
-            width: 0.5,
-          ),
-          columnWidths: {
-            0: const pw.FlexColumnWidth(2),
-            1: const pw.FlexColumnWidth(3),
-            2: const pw.FlexColumnWidth(2),
-            3: const pw.FlexColumnWidth(1.5),
-          },
-          children: [
-            // Header
-            pw.TableRow(
-              decoration: pw.BoxDecoration(
-                color: PdfColor.fromHex('F5F5FF'),
-              ),
-              children: [
-                _pdfTableCell(
-                    lang == 'mn' ? 'Огноо' : 'Date',
-                    isHeader: true),
-                _pdfTableCell(
-                    lang == 'mn' ? 'Ангилал' : 'Category',
-                    isHeader: true),
-                _pdfTableCell(
-                    lang == 'mn' ? 'Дүн' : 'Amount',
-                    isHeader: true),
-                _pdfTableCell(
-                    lang == 'mn' ? 'Төрөл' : 'Type',
-                    isHeader: true),
-              ],
-            ),
-            // Rows
-            ...monthTxns.map((t) {
-              final isIncome = t.type == 'income';
-              final dateStr =
-                  '${t.date.year}/${t.date.month.toString().padLeft(2, '0')}/${t.date.day.toString().padLeft(2, '0')}';
-              return pw.TableRow(
-                children: [
-                  _pdfTableCell(dateStr),
-                  _pdfTableCell(getCategoryName(t.categoryId)),
-                  _pdfTableCell(
-                    '${isIncome ? '+' : '-'}$currency${_fmt(t.amount)}',
-                    color: isIncome
-                        ? PdfColor.fromHex('27AE60')
-                        : PdfColor.fromHex('E74C3C'),
-                  ),
-                  _pdfTableCell(
-                    isIncome
-                        ? (lang == 'mn' ? 'Орлого' : 'Income')
-                        : (lang == 'mn' ? 'Зарлага' : 'Expense'),
-                  ),
-                ],
-              );
-            }),
-          ],
-        ),
-
-        pw.SizedBox(height: 24),
-
-        // ── Footer ──
-        pw.Divider(color: PdfColor.fromHex('E8E8E8')),
-        pw.SizedBox(height: 8),
-        pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-          children: [
-            pw.Text(
-              'Expense Tracker Pro',
-              style: const pw.TextStyle(
-                color: PdfColors.grey,
-                fontSize: 10,
-              ),
-            ),
-            pw.Text(
-              '${DateTime.now().year}/${DateTime.now().month.toString().padLeft(2, '0')}/${DateTime.now().day.toString().padLeft(2, '0')}',
-              style: const pw.TextStyle(
-                color: PdfColors.grey,
-                fontSize: 10,
-              ),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-
-  // PDF харуулах / хадгалах
-  await Printing.layoutPdf(
-    onLayout: (PdfPageFormat format) async => pdf.save(),
-    name: 'report_${_selectedMonth.year}_${_selectedMonth.month}.pdf',
-  );
-}
-
-// PDF helper widgets
-pw.Widget _pdfStatBox({
-  required String label,
-  required String amount,
-  required PdfColor color,
-}) {
-  return pw.Container(
-    padding: const pw.EdgeInsets.all(12),
-    decoration: pw.BoxDecoration(
-      border: pw.Border.all(color: color, width: 1.5),
-      borderRadius: pw.BorderRadius.circular(8),
-    ),
-    child: pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        pw.Text(label,
-            style: pw.TextStyle(
-                color: color,
-                fontSize: 11,
-                fontWeight: pw.FontWeight.bold)),
-        pw.SizedBox(height: 4),
-        pw.Text(amount,
-            style: pw.TextStyle(
-                fontSize: 16,
-                fontWeight: pw.FontWeight.bold,
-                color: PdfColor.fromHex('1A1A2E'))),
-      ],
-    ),
-  );
-}
-
-pw.Widget _pdfTableCell(
-  String text, {
-  bool isHeader = false,
-  PdfColor? color,
-}) {
-  return pw.Padding(
-    padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-    child: pw.Text(
-      text,
-      style: pw.TextStyle(
-        fontSize: isHeader ? 11 : 10,
-        fontWeight:
-            isHeader ? pw.FontWeight.bold : pw.FontWeight.normal,
-        color: color ?? PdfColor.fromHex('1A1A2E'),
       ),
-    ),
-  );
-}
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+      name: 'report_${_selectedMonth.year}_${_selectedMonth.month}.pdf',
+    );
+  }
+
+  pw.Widget _pdfStatBox({
+    required String label,
+    required String amount,
+    required PdfColor color,
+    required pw.Font font,
+    required pw.Font fontBold,
+  }) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.all(12),
+      decoration: pw.BoxDecoration(
+        border: pw.Border.all(color: color, width: 1.5),
+        borderRadius: pw.BorderRadius.circular(8),
+      ),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(label,
+              style: pw.TextStyle(
+                  color: color,
+                  fontSize: 11,
+                  fontWeight: pw.FontWeight.bold,
+                  font: fontBold)),
+          pw.SizedBox(height: 4),
+          pw.Text(amount,
+              style: pw.TextStyle(
+                  fontSize: 16,
+                  fontWeight: pw.FontWeight.bold,
+                  font: fontBold,
+                  color: PdfColor.fromHex('1A1A2E'))),
+        ],
+      ),
+    );
+  }
+
+  pw.Widget _pdfTableCell(
+    String text, {
+    bool isHeader = false,
+    PdfColor? color,
+    required pw.Font font,
+    required pw.Font fontBold,
+  }) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      child: pw.Text(
+        text,
+        style: pw.TextStyle(
+          fontSize: isHeader ? 11 : 10,
+          fontWeight:
+              isHeader ? pw.FontWeight.bold : pw.FontWeight.normal,
+          font: isHeader ? fontBold : font,
+          color: color ?? PdfColor.fromHex('1A1A2E'),
+        ),
+      ),
+    );
+  }
 }
